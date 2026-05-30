@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ShieldCheck, ShieldAlert, Wallet, Car, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { DriverRideFlow } from "@/components/driver/ride-flow";
 
 type DriverRow = {
   verification_status: "pending" | "verified_digital" | "verified_physical" | "suspended";
@@ -179,6 +180,10 @@ export function DriverHome() {
         </Card>
       </div>
 
+      <div className="mt-5">
+        <DriverRideFlow />
+      </div>
+
       <Card className="mt-5 p-6">
         <div className="flex items-start gap-3">
           <Car className="size-5 text-primary" />
@@ -195,11 +200,6 @@ export function DriverHome() {
           </Button>
         </div>
       </Card>
-
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        Ride acceptance flow ships next — drivers will receive rides via WhatsApp and accept
-        them here.
-      </p>
     </DashboardShell>
   );
 }
