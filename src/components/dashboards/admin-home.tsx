@@ -410,16 +410,18 @@ function DriverManageDialog({
 
   const save = async () => {
     setSaving(true);
-    const patch: Record<string, unknown> = {
+    const badgeValue: DriverRow["badge_type"] =
+      status === "verified_physical"
+        ? "physically_verified"
+        : status === "verified_digital"
+          ? (badge ?? "verified")
+          : null;
+    const patch = {
       verification_status: status,
-      suspension_reason: status === "suspended" ? reason || "Suspended by admin" : null,
+      suspension_reason:
+        status === "suspended" ? reason || "Suspended by admin" : null,
+      badge_type: badgeValue,
     };
-    if (status === "verified_digital" || status === "verified_physical") {
-      patch.badge_type =
-        status === "verified_physical" ? "physically_verified" : "verified";
-    } else {
-      patch.badge_type = null;
-    }
     const { error } = await supabase
       .from("drivers")
       .update(patch)
