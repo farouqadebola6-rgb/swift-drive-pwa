@@ -414,7 +414,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      matched_driver_public: {
+        Row: {
+          badge_type: Database["public"]["Enums"]["driver_badge_type"] | null
+          plate_number: string | null
+          user_id: string | null
+          vehicle_colour: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_photo_url: string | null
+          verification_status:
+            | Database["public"]["Enums"]["driver_verification_status"]
+            | null
+        }
+        Insert: {
+          badge_type?: Database["public"]["Enums"]["driver_badge_type"] | null
+          plate_number?: string | null
+          user_id?: string | null
+          vehicle_colour?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_photo_url?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["driver_verification_status"]
+            | null
+        }
+        Update: {
+          badge_type?: Database["public"]["Enums"]["driver_badge_type"] | null
+          plate_number?: string | null
+          user_id?: string | null
+          vehicle_colour?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_photo_url?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["driver_verification_status"]
+            | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_ride: {
