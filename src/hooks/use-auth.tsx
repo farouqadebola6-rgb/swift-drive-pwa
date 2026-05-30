@@ -28,11 +28,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
-      .order("role", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    setRole((data?.role as AppRole | undefined) ?? null);
+      .eq("user_id", userId);
+    const roles = (data ?? []).map((r) => r.role as AppRole);
+    // Precedence: admin > driver > rider (a user with multiple roles sees the most powerful dashboard)
+    const picked: AppRole | null = roles.includes("admin")
+      ? "admin"
+      : roles.includes("driver")
+        ? "driver"
+        : roles.includes("rider")
+          ? "rider"
+          : null;
+    setRole(picked);
   };
 
   useEffect(() => {
