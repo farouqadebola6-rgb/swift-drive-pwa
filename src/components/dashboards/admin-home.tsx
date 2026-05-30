@@ -883,7 +883,3 @@ function PriceField({
   );
 }
 
-// Local icon import workaround (Wallet used in StatCard sub)
-import { Wallet } from "lucide-react";
-// Prevent unused import lint
-void ProfileRow;
