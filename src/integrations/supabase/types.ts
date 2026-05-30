@@ -417,12 +417,142 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_ride: {
+        Args: { p_ride_id: number }
+        Returns: {
+          acceptance_token: string
+          accepted_at: string | null
+          actual_distance_km: number | null
+          actual_duration_min: number | null
+          arrived_at: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          destination_address: string
+          destination_area: string
+          destination_lat: number
+          destination_lng: number
+          driver_id: string | null
+          driver_pickup_lat: number | null
+          driver_pickup_lng: number | null
+          estimated_distance_km: number | null
+          estimated_duration_min: number | null
+          fare_estimate: number
+          final_fare: number | null
+          id: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          pickup_address: string
+          pickup_area: string
+          pickup_lat: number
+          pickup_lng: number
+          rider_id: string
+          status: Database["public"]["Enums"]["ride_status"]
+          trip_end_time: string | null
+          trip_start_time: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      complete_ride: {
+        Args: {
+          p_actual_distance_km: number
+          p_actual_duration_min: number
+          p_ride_id: number
+        }
+        Returns: {
+          acceptance_token: string
+          accepted_at: string | null
+          actual_distance_km: number | null
+          actual_duration_min: number | null
+          arrived_at: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          destination_address: string
+          destination_area: string
+          destination_lat: number
+          destination_lng: number
+          driver_id: string | null
+          driver_pickup_lat: number | null
+          driver_pickup_lng: number | null
+          estimated_distance_km: number | null
+          estimated_duration_min: number | null
+          fare_estimate: number
+          final_fare: number | null
+          id: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          pickup_address: string
+          pickup_area: string
+          pickup_lat: number
+          pickup_lng: number
+          rider_id: string
+          status: Database["public"]["Enums"]["ride_status"]
+          trip_end_time: string | null
+          trip_start_time: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      mark_ride_status: {
+        Args: {
+          p_ride_id: number
+          p_status: Database["public"]["Enums"]["ride_status"]
+        }
+        Returns: {
+          acceptance_token: string
+          accepted_at: string | null
+          actual_distance_km: number | null
+          actual_duration_min: number | null
+          arrived_at: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          destination_address: string
+          destination_area: string
+          destination_lat: number
+          destination_lng: number
+          driver_id: string | null
+          driver_pickup_lat: number | null
+          driver_pickup_lng: number | null
+          estimated_distance_km: number | null
+          estimated_duration_min: number | null
+          fare_estimate: number
+          final_fare: number | null
+          id: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          pickup_address: string
+          pickup_area: string
+          pickup_lat: number
+          pickup_lng: number
+          rider_id: string
+          status: Database["public"]["Enums"]["ride_status"]
+          trip_end_time: string | null
+          trip_start_time: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
