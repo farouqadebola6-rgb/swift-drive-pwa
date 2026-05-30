@@ -43,7 +43,7 @@ import {
   ShieldX,
   Search,
 } from "lucide-react";
-import { STATUS_LABEL, STATUS_TONE, formatNaira } from "@/lib/ride-flow";
+import { STATUS_LABEL, STATUS_TONE, naira } from "@/lib/ride-flow";
 
 type Pricing = {
   base_fare: number;
@@ -219,12 +219,12 @@ function OverviewTab() {
       <StatCard
         icon={<Banknote className="size-5" />}
         label="Completed revenue"
-        value={counts ? formatNaira(counts.revenue) : undefined}
+        value={counts ? naira(counts.revenue) : undefined}
       />
       <StatCard
         icon={<Wallet className="size-5" />}
         label="Outstanding cash debt"
-        value={counts ? formatNaira(counts.debt) : undefined}
+        value={counts ? naira(counts.debt) : undefined}
       />
     </div>
   );
@@ -355,7 +355,7 @@ function DriversTab() {
                   <TableCell className="text-sm">
                     {d.total_cash_debt > 0 ? (
                       <span className="font-medium text-warning">
-                        {formatNaira(d.total_cash_debt)}
+                        {naira(d.total_cash_debt)}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">₦0</span>
@@ -495,7 +495,7 @@ function DriverManageDialog({
             Bank: {driver.bank_name ?? "—"} · Acct:{" "}
             {driver.account_number ?? "—"}
             <br />
-            Outstanding debt: {formatNaira(driver.total_cash_debt)}
+            Outstanding debt: {naira(driver.total_cash_debt)}
           </div>
         </div>
 
@@ -613,15 +613,15 @@ function RidesTab() {
                     {r.pickup_area} → {r.destination_area}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={STATUS_TONE[r.status] ?? ""}>
-                      {STATUS_LABEL[r.status] ?? r.status}
+                    <Badge variant="outline" className={STATUS_TONE[r.status as keyof typeof STATUS_TONE] ?? ""}>
+                      {STATUS_LABEL[r.status as keyof typeof STATUS_LABEL] ?? r.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs uppercase">
                     {r.payment_method}
                   </TableCell>
                   <TableCell className="text-right text-sm">
-                    {formatNaira(Number(r.final_fare ?? r.fare_estimate))}
+                    {naira(Number(r.final_fare ?? r.fare_estimate))}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
                     {new Date(r.created_at).toLocaleString()}
@@ -717,7 +717,7 @@ function DebtsTab() {
                     {names.get(d.driver_id) ?? "—"}
                   </TableCell>
                   <TableCell className="font-mono text-xs">#{d.ride_id}</TableCell>
-                  <TableCell>{formatNaira(Number(d.amount_owed))}</TableCell>
+                  <TableCell>{naira(Number(d.amount_owed))}</TableCell>
                   <TableCell>
                     {d.settled ? (
                       <Badge className="bg-success/15 text-success hover:bg-success/15">
