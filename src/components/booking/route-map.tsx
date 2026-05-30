@@ -7,50 +7,50 @@ interface Props {
   route: RouteResult | null;
 }
 
+type LeafletMods = {
+  L: typeof import("leaflet");
+  RL: typeof import("react-leaflet");
+};
+
 // Leaflet must only run on the client (uses window/document at import time).
-export function RouteMap(props: Props) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) {
+export function RouteMap({ pickup, destination, route }: Props) {
+  const [mods, setMods] = useState<LeafletMods | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [L, RL] = await Promise.all([
+        import("leaflet"),
+        import("react-leaflet"),
+      ]);
+      await import("leaflet/dist/leaflet.css");
+      if (!cancelled) setMods({ L: L.default ?? L, RL });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!mods) {
     return (
       <div className="grid h-72 w-full place-items-center rounded-lg border border-border bg-muted text-xs text-muted-foreground">
         Loading map…
       </div>
     );
   }
-  return <LeafletMap {...props} />;
-}
 
-function LeafletMap({ pickup, destination, route }: Props) {
-  // Dynamic require inside client-only render
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const L = require("leaflet") as typeof import("leaflet");
-  const {
-    MapContainer,
-    TileLayer,
-    Marker,
-    Polyline,
-    useMap,
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-  } = require("react-leaflet") as typeof import("react-leaflet");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require("leaflet/dist/leaflet.css");
+  const { L, RL } = mods;
+  const { MapContainer, TileLayer, Marker, Polyline, useMap } = RL;
 
-  // Fix default icons (Vite asset URLs)
   const icon = L.icon({
-    iconUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    shadowUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
   });
 
-  const center: [number, number] = pickup
-    ? [pickup.lat, pickup.lng]
-    : [6.5244, 3.3792]; // Lagos
+  const center: [number, number] = pickup ? [pickup.lat, pickup.lng] : [6.5244, 3.3792];
 
   function FitBounds() {
     const map = useMap();
@@ -68,6 +68,7 @@ function LeafletMap({ pickup, destination, route }: Props) {
       } else if (pickup) {
         map.setView([pickup.lat, pickup.lng], 14);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map]);
     return null;
   }
