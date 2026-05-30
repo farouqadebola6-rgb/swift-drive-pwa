@@ -42,6 +42,7 @@ import {
   ShieldAlert,
   ShieldX,
   Search,
+  Wallet,
 } from "lucide-react";
 import { STATUS_LABEL, STATUS_TONE, naira } from "@/lib/ride-flow";
 
