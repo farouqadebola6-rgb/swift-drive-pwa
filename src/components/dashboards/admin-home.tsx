@@ -296,6 +296,51 @@ function DriversTab() {
     return true;
   });
 
+  const exportCsv = () => {
+    const rows = visible.map((d) => ({
+      full_name: d.profile?.full_name ?? "",
+      phone: d.profile?.phone ?? "",
+      verification_status: d.verification_status,
+      badge: d.badge_type ?? "",
+      date_of_birth: d.date_of_birth ?? "",
+      nin: d.nin ?? "",
+      home_address: d.home_address ?? "",
+      licence_number: d.drivers_license_number ?? "",
+      licence_expiry: d.drivers_license_expiry ?? "",
+      emergency_name: d.emergency_contact_name ?? "",
+      emergency_phone: d.emergency_contact_phone ?? "",
+      vehicle: `${d.vehicle_colour ?? ""} ${d.vehicle_make ?? ""} ${d.vehicle_model ?? ""}`.trim(),
+      vehicle_year: d.vehicle_year ?? "",
+      plate_number: d.plate_number ?? "",
+      vehicle_registration_number: d.vehicle_registration_number ?? "",
+      bank: d.bank_name ?? "",
+      account_number: d.account_number ?? "",
+      cash_debt: d.total_cash_debt,
+      onboarding_submitted_at: d.onboarding_submitted_at ?? "",
+      created_at: d.created_at,
+    }));
+    if (!rows.length) {
+      toast.error("No drivers to export");
+      return;
+    }
+    const headers = Object.keys(rows[0]);
+    const escape = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [
+      headers.join(","),
+      ...rows.map((r) => headers.map((h) => escape((r as Record<string, unknown>)[h])).join(",")),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `drivers-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Card className="p-4">
       <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -320,6 +365,9 @@ function DriversTab() {
             <SelectItem value="suspended">Suspended</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={exportCsv}>
+          Export CSV
+        </Button>
       </div>
 
       {!drivers ? (
