@@ -65,11 +65,26 @@ type DriverRow = {
   vehicle_make: string | null;
   vehicle_model: string | null;
   vehicle_colour: string | null;
+  vehicle_year: number | null;
+  vehicle_registration_number: string | null;
   bank_name: string | null;
   account_number: string | null;
   total_cash_debt: number;
   suspension_reason: string | null;
   created_at: string;
+  date_of_birth: string | null;
+  home_address: string | null;
+  nin: string | null;
+  drivers_license_number: string | null;
+  drivers_license_expiry: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  profile_photo_url: string | null;
+  vehicle_photo_url: string | null;
+  licence_url: string | null;
+  insurance_doc_url: string | null;
+  vehicle_registration_doc_url: string | null;
+  onboarding_submitted_at: string | null;
   profile?: { full_name: string | null; phone: string | null } | null;
 };
 
@@ -281,6 +296,51 @@ function DriversTab() {
     return true;
   });
 
+  const exportCsv = () => {
+    const rows = visible.map((d) => ({
+      full_name: d.profile?.full_name ?? "",
+      phone: d.profile?.phone ?? "",
+      verification_status: d.verification_status,
+      badge: d.badge_type ?? "",
+      date_of_birth: d.date_of_birth ?? "",
+      nin: d.nin ?? "",
+      home_address: d.home_address ?? "",
+      licence_number: d.drivers_license_number ?? "",
+      licence_expiry: d.drivers_license_expiry ?? "",
+      emergency_name: d.emergency_contact_name ?? "",
+      emergency_phone: d.emergency_contact_phone ?? "",
+      vehicle: `${d.vehicle_colour ?? ""} ${d.vehicle_make ?? ""} ${d.vehicle_model ?? ""}`.trim(),
+      vehicle_year: d.vehicle_year ?? "",
+      plate_number: d.plate_number ?? "",
+      vehicle_registration_number: d.vehicle_registration_number ?? "",
+      bank: d.bank_name ?? "",
+      account_number: d.account_number ?? "",
+      cash_debt: d.total_cash_debt,
+      onboarding_submitted_at: d.onboarding_submitted_at ?? "",
+      created_at: d.created_at,
+    }));
+    if (!rows.length) {
+      toast.error("No drivers to export");
+      return;
+    }
+    const headers = Object.keys(rows[0]);
+    const escape = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [
+      headers.join(","),
+      ...rows.map((r) => headers.map((h) => escape((r as Record<string, unknown>)[h])).join(",")),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `drivers-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Card className="p-4">
       <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -305,6 +365,9 @@ function DriversTab() {
             <SelectItem value="suspended">Suspended</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={exportCsv}>
+          Export CSV
+        </Button>
       </div>
 
       {!drivers ? (
@@ -494,15 +557,10 @@ function DriverManageDialog({
             </div>
           )}
 
-          <div className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
-            Bank: {driver.bank_name ?? "—"} · Acct:{" "}
-            {driver.account_number ?? "—"}
-            <br />
-            Outstanding debt: {naira(driver.total_cash_debt)}
-          </div>
+          <DriverDetailsBlock driver={driver} />
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="mt-2">
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
@@ -513,6 +571,95 @@ function DriverManageDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function DriverDetailsBlock({ driver }: { driver: DriverRow }) {
+  const openDoc = async (path: string | null) => {
+    if (!path) return;
+    const { data, error } = await supabase.storage
+      .from("driver-documents")
+      .createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error(error?.message ?? "Could not open file");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const Row = ({ k, v }: { k: string; v: React.ReactNode }) => (
+    <div className="flex justify-between gap-3 border-b border-border/50 py-1 last:border-0">
+      <span className="text-muted-foreground">{k}</span>
+      <span className="text-right font-medium">{v || "—"}</span>
+    </div>
+  );
+
+  const docs: { label: string; path: string | null }[] = [
+    { label: "Profile photo", path: driver.profile_photo_url },
+    { label: "Driver's licence", path: driver.licence_url },
+    { label: "Vehicle photo", path: driver.vehicle_photo_url },
+    { label: "Vehicle registration", path: driver.vehicle_registration_doc_url },
+    { label: "Insurance", path: driver.insurance_doc_url },
+  ];
+
+  return (
+    <div className="space-y-3 rounded-md border bg-muted/30 p-3 text-xs">
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Personal</p>
+        <Row k="Date of birth" v={driver.date_of_birth} />
+        <Row k="NIN" v={driver.nin} />
+        <Row k="Home address" v={driver.home_address} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Licence</p>
+        <Row k="Number" v={driver.drivers_license_number} />
+        <Row k="Expiry" v={driver.drivers_license_expiry} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Emergency contact</p>
+        <Row k="Name" v={driver.emergency_contact_name} />
+        <Row k="Phone" v={driver.emergency_contact_phone} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Vehicle</p>
+        <Row
+          k="Make / Model"
+          v={`${driver.vehicle_colour ?? ""} ${driver.vehicle_make ?? ""} ${driver.vehicle_model ?? ""}`.trim()}
+        />
+        <Row k="Year" v={driver.vehicle_year} />
+        <Row k="Plate" v={driver.plate_number} />
+        <Row k="Registration #" v={driver.vehicle_registration_number} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Payout</p>
+        <Row k="Bank" v={driver.bank_name} />
+        <Row k="Account" v={driver.account_number} />
+        <Row k="Cash debt" v={naira(driver.total_cash_debt)} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Documents</p>
+        <div className="flex flex-wrap gap-2">
+          {docs.map((d) => (
+            <Button
+              key={d.label}
+              size="sm"
+              variant={d.path ? "outline" : "ghost"}
+              disabled={!d.path}
+              onClick={() => void openDoc(d.path)}
+            >
+              {d.label}
+              {!d.path && " (none)"}
+            </Button>
+          ))}
+        </div>
+      </div>
+      <p className="pt-1 text-muted-foreground">
+        Submitted:{" "}
+        {driver.onboarding_submitted_at
+          ? new Date(driver.onboarding_submitted_at).toLocaleString()
+          : "Not yet submitted"}
+      </p>
+    </div>
   );
 }
 

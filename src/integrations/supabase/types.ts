@@ -96,10 +96,20 @@ export type Database = {
           badge_type: Database["public"]["Enums"]["driver_badge_type"] | null
           bank_name: string | null
           created_at: string
+          date_of_birth: string | null
           debt_locked_at: string | null
+          drivers_license_expiry: string | null
+          drivers_license_number: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          home_address: string | null
+          insurance_doc_url: string | null
           licence_url: string | null
+          nin: string | null
+          onboarding_submitted_at: string | null
           paystack_subaccount_code: string | null
           plate_number: string | null
+          profile_photo_url: string | null
           suspension_reason: string | null
           total_cash_debt: number
           updated_at: string
@@ -108,6 +118,9 @@ export type Database = {
           vehicle_make: string | null
           vehicle_model: string | null
           vehicle_photo_url: string | null
+          vehicle_registration_doc_url: string | null
+          vehicle_registration_number: string | null
+          vehicle_year: number | null
           verification_status: Database["public"]["Enums"]["driver_verification_status"]
         }
         Insert: {
@@ -115,10 +128,20 @@ export type Database = {
           badge_type?: Database["public"]["Enums"]["driver_badge_type"] | null
           bank_name?: string | null
           created_at?: string
+          date_of_birth?: string | null
           debt_locked_at?: string | null
+          drivers_license_expiry?: string | null
+          drivers_license_number?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          home_address?: string | null
+          insurance_doc_url?: string | null
           licence_url?: string | null
+          nin?: string | null
+          onboarding_submitted_at?: string | null
           paystack_subaccount_code?: string | null
           plate_number?: string | null
+          profile_photo_url?: string | null
           suspension_reason?: string | null
           total_cash_debt?: number
           updated_at?: string
@@ -127,6 +150,9 @@ export type Database = {
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_photo_url?: string | null
+          vehicle_registration_doc_url?: string | null
+          vehicle_registration_number?: string | null
+          vehicle_year?: number | null
           verification_status?: Database["public"]["Enums"]["driver_verification_status"]
         }
         Update: {
@@ -134,10 +160,20 @@ export type Database = {
           badge_type?: Database["public"]["Enums"]["driver_badge_type"] | null
           bank_name?: string | null
           created_at?: string
+          date_of_birth?: string | null
           debt_locked_at?: string | null
+          drivers_license_expiry?: string | null
+          drivers_license_number?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          home_address?: string | null
+          insurance_doc_url?: string | null
           licence_url?: string | null
+          nin?: string | null
+          onboarding_submitted_at?: string | null
           paystack_subaccount_code?: string | null
           plate_number?: string | null
+          profile_photo_url?: string | null
           suspension_reason?: string | null
           total_cash_debt?: number
           updated_at?: string
@@ -146,6 +182,9 @@ export type Database = {
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_photo_url?: string | null
+          vehicle_registration_doc_url?: string | null
+          vehicle_registration_number?: string | null
+          vehicle_year?: number | null
           verification_status?: Database["public"]["Enums"]["driver_verification_status"]
         }
         Relationships: []
