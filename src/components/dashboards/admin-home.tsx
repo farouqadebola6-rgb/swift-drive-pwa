@@ -557,15 +557,10 @@ function DriverManageDialog({
             </div>
           )}
 
-          <div className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
-            Bank: {driver.bank_name ?? "—"} · Acct:{" "}
-            {driver.account_number ?? "—"}
-            <br />
-            Outstanding debt: {naira(driver.total_cash_debt)}
-          </div>
+          <DriverDetailsBlock driver={driver} />
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="mt-2">
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
