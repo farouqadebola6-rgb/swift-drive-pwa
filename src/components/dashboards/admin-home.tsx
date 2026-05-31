@@ -65,11 +65,26 @@ type DriverRow = {
   vehicle_make: string | null;
   vehicle_model: string | null;
   vehicle_colour: string | null;
+  vehicle_year: number | null;
+  vehicle_registration_number: string | null;
   bank_name: string | null;
   account_number: string | null;
   total_cash_debt: number;
   suspension_reason: string | null;
   created_at: string;
+  date_of_birth: string | null;
+  home_address: string | null;
+  nin: string | null;
+  drivers_license_number: string | null;
+  drivers_license_expiry: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  profile_photo_url: string | null;
+  vehicle_photo_url: string | null;
+  licence_url: string | null;
+  insurance_doc_url: string | null;
+  vehicle_registration_doc_url: string | null;
+  onboarding_submitted_at: string | null;
   profile?: { full_name: string | null; phone: string | null } | null;
 };
 
