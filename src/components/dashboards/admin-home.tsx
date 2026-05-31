@@ -574,6 +574,95 @@ function DriverManageDialog({
   );
 }
 
+function DriverDetailsBlock({ driver }: { driver: DriverRow }) {
+  const openDoc = async (path: string | null) => {
+    if (!path) return;
+    const { data, error } = await supabase.storage
+      .from("driver-documents")
+      .createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error(error?.message ?? "Could not open file");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const Row = ({ k, v }: { k: string; v: React.ReactNode }) => (
+    <div className="flex justify-between gap-3 border-b border-border/50 py-1 last:border-0">
+      <span className="text-muted-foreground">{k}</span>
+      <span className="text-right font-medium">{v || "—"}</span>
+    </div>
+  );
+
+  const docs: { label: string; path: string | null }[] = [
+    { label: "Profile photo", path: driver.profile_photo_url },
+    { label: "Driver's licence", path: driver.licence_url },
+    { label: "Vehicle photo", path: driver.vehicle_photo_url },
+    { label: "Vehicle registration", path: driver.vehicle_registration_doc_url },
+    { label: "Insurance", path: driver.insurance_doc_url },
+  ];
+
+  return (
+    <div className="space-y-3 rounded-md border bg-muted/30 p-3 text-xs">
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Personal</p>
+        <Row k="Date of birth" v={driver.date_of_birth} />
+        <Row k="NIN" v={driver.nin} />
+        <Row k="Home address" v={driver.home_address} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Licence</p>
+        <Row k="Number" v={driver.drivers_license_number} />
+        <Row k="Expiry" v={driver.drivers_license_expiry} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Emergency contact</p>
+        <Row k="Name" v={driver.emergency_contact_name} />
+        <Row k="Phone" v={driver.emergency_contact_phone} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Vehicle</p>
+        <Row
+          k="Make / Model"
+          v={`${driver.vehicle_colour ?? ""} ${driver.vehicle_make ?? ""} ${driver.vehicle_model ?? ""}`.trim()}
+        />
+        <Row k="Year" v={driver.vehicle_year} />
+        <Row k="Plate" v={driver.plate_number} />
+        <Row k="Registration #" v={driver.vehicle_registration_number} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Payout</p>
+        <Row k="Bank" v={driver.bank_name} />
+        <Row k="Account" v={driver.account_number} />
+        <Row k="Cash debt" v={naira(driver.total_cash_debt)} />
+      </div>
+      <div>
+        <p className="mb-1 font-semibold text-foreground">Documents</p>
+        <div className="flex flex-wrap gap-2">
+          {docs.map((d) => (
+            <Button
+              key={d.label}
+              size="sm"
+              variant={d.path ? "outline" : "ghost"}
+              disabled={!d.path}
+              onClick={() => void openDoc(d.path)}
+            >
+              {d.label}
+              {!d.path && " (none)"}
+            </Button>
+          ))}
+        </div>
+      </div>
+      <p className="pt-1 text-muted-foreground">
+        Submitted:{" "}
+        {driver.onboarding_submitted_at
+          ? new Date(driver.onboarding_submitted_at).toLocaleString()
+          : "Not yet submitted"}
+      </p>
+    </div>
+  );
+}
+
 function VerificationBadge({
   status,
 }: {
