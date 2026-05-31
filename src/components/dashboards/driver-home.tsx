@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DashboardShell } from "./dashboard-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ShieldCheck, ShieldAlert, Wallet, Car, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { DriverRideFlow } from "@/components/driver/ride-flow";
+import { DriverOnboardingForm } from "@/components/driver/onboarding-form";
 
 type DriverRow = {
   verification_status: "pending" | "verified_digital" | "verified_physical" | "suspended";
@@ -20,54 +20,52 @@ type DriverRow = {
   account_number: string | null;
   total_cash_debt: number;
   suspension_reason: string | null;
+  onboarding_submitted_at: string | null;
+  [key: string]: unknown;
 };
 
 export function DriverHome() {
   const { user } = useAuth();
   const [driver, setDriver] = useState<DriverRow | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string | null; phone: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!user) return;
-    let active = true;
-    void (async () => {
-      const { data, error } = await supabase
+    const { data, error } = await supabase
+      .from("drivers")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+    let row = data as DriverRow | null;
+    if (!row) {
+      await supabase.from("drivers").insert({ user_id: user.id });
+      const { data: again } = await supabase
         .from("drivers")
-        .select(
-          "verification_status, badge_type, plate_number, vehicle_make, vehicle_model, vehicle_colour, bank_name, account_number, total_cash_debt, suspension_reason"
-        )
+        .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
-      if (!active) return;
-      if (error) {
-        toast.error(error.message);
-        setLoading(false);
-        return;
-      }
-      if (!data) {
-        // First time driver — create shell row
-        await supabase.from("drivers").insert({ user_id: user.id });
-        setDriver({
-          verification_status: "pending",
-          badge_type: null,
-          plate_number: null,
-          vehicle_make: null,
-          vehicle_model: null,
-          vehicle_colour: null,
-          bank_name: null,
-          account_number: null,
-          total_cash_debt: 0,
-          suspension_reason: null,
-        });
-      } else {
-        setDriver(data as DriverRow);
-      }
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+      row = (again as DriverRow | null) ?? null;
+    }
+    setDriver(row);
+
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", user.id)
+      .maybeSingle();
+    setProfile(prof ?? null);
+    setLoading(false);
   }, [user]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) {
     return (
@@ -101,24 +99,39 @@ export function DriverHome() {
   }
 
   if (driver.verification_status === "pending") {
+    if (!driver.onboarding_submitted_at) {
+      return (
+        <DashboardShell
+          title="Driver onboarding"
+          subtitle="Complete your application to start accepting rides."
+        >
+          <DriverOnboardingForm
+            initial={{
+              ...driver,
+              __full_name: profile?.full_name ?? "",
+              __phone: profile?.phone ?? "",
+            }}
+            onSubmitted={() => void load()}
+          />
+        </DashboardShell>
+      );
+    }
     return (
       <DashboardShell
         title="Verification pending"
-        subtitle="Our team will review your details shortly."
+        subtitle="Our team will review your application shortly."
       >
         <Card className="p-6">
           <div className="flex items-start gap-3">
-            <div className="grid size-10 place-items-center rounded-lg bg-warning/15 text-warning-foreground">
+            <div className="grid size-10 place-items-center rounded-lg bg-warning/15">
               <ShieldAlert className="size-5 text-warning" />
             </div>
             <div>
-              <h3 className="font-semibold">Awaiting verification</h3>
+              <h3 className="font-semibold">Application submitted</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                For the MVP, drivers are onboarded in person at LASU axis. Once verified, you'll
-                see incoming rides here and in the WhatsApp dispatch group.
-              </p>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Need to update your details? Driver onboarding form ships in Phase 2.
+                We received your documents on{" "}
+                {new Date(driver.onboarding_submitted_at).toLocaleDateString()}.
+                Reviews typically complete within 24 hours. You'll be notified once verified.
               </p>
             </div>
           </div>
@@ -127,7 +140,6 @@ export function DriverHome() {
     );
   }
 
-  // Verified
   const debtLocked = driver.total_cash_debt > 0;
   return (
     <DashboardShell
@@ -195,9 +207,6 @@ export function DriverHome() {
                 : "Vehicle details not yet recorded."}
             </p>
           </div>
-          <Button variant="outline" size="sm" disabled>
-            Edit
-          </Button>
         </div>
       </Card>
     </DashboardShell>
