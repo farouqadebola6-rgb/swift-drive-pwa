@@ -50,7 +50,7 @@ export const Route = createFileRoute("/api/public/paystack/webhook")({
           await supabaseAdmin
             .from("payments")
             .update({
-              status: "successful",
+              status: "captured",
               paystack_authorization_code:
                 payload.data?.authorization?.authorization_code ?? null,
               updated_at: new Date().toISOString(),
