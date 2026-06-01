@@ -196,6 +196,11 @@ export function RiderActiveRide({ ride }: Props) {
         </div>
       )}
 
+      {ride.payment_method === "online" &&
+        (ride.status === "started" || ride.status === "completed") && (
+          <PayOnlineButton rideId={ride.id} />
+        )}
+
       {isCompleted && !existingRating && (
         <div className="mt-5 border-t border-border pt-5">
           <p className="mb-2 text-sm font-medium">Rate your driver</p>
