@@ -282,28 +282,11 @@ function loadPaystackScript(): Promise<PaystackPop> {
 }
 
 function PayOnlineButton({ rideId }: { rideId: number }) {
-  const { user } = useAuth();
-  const qc = useQueryClient();
   const pay = useMutation({
     mutationFn: async () => {
       const init = await initRidePayment({ data: { rideId } });
-      const pop = await loadPaystackScript();
-      await new Promise<void>((resolve, reject) => {
-        pop.newTransaction({
-          key: init.public_key,
-          email: user?.email ?? "",
-          amount: Math.round(
-            Number(init.authorization_url ? 0 : 0) || 0,
-          ), // amount is server-set via reference; v2 inline accepts amount too
-          ref: init.reference,
-          onSuccess: () => resolve(),
-          onCancel: () => reject(new Error("Payment cancelled")),
-        });
-      });
-    },
-    onSuccess: () => {
-      toast.success("Payment received — thank you!");
-      void qc.invalidateQueries({ queryKey: ["activeRide"] });
+      if (!init.authorization_url) throw new Error("Could not start payment");
+      window.location.href = init.authorization_url;
     },
     onError: (e: Error) => toast.error(e.message),
   });
