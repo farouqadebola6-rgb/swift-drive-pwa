@@ -247,6 +247,7 @@ export type Database = {
           per_km_rate: number
           per_minute_rate: number
           updated_at: string
+          whatsapp_group_jid: string | null
         }
         Insert: {
           base_fare?: number
@@ -255,6 +256,7 @@ export type Database = {
           per_km_rate?: number
           per_minute_rate?: number
           updated_at?: string
+          whatsapp_group_jid?: string | null
         }
         Update: {
           base_fare?: number
@@ -263,6 +265,7 @@ export type Database = {
           per_km_rate?: number
           per_minute_rate?: number
           updated_at?: string
+          whatsapp_group_jid?: string | null
         }
         Relationships: []
       }
@@ -345,6 +348,7 @@ export type Database = {
           destination_area: string
           destination_lat: number
           destination_lng: number
+          dispatched_at: string | null
           driver_id: string | null
           driver_pickup_lat: number | null
           driver_pickup_lng: number | null
@@ -377,6 +381,7 @@ export type Database = {
           destination_area: string
           destination_lat: number
           destination_lng: number
+          dispatched_at?: string | null
           driver_id?: string | null
           driver_pickup_lat?: number | null
           driver_pickup_lng?: number | null
@@ -409,6 +414,7 @@ export type Database = {
           destination_area?: string
           destination_lat?: number
           destination_lng?: number
+          dispatched_at?: string | null
           driver_id?: string | null
           driver_pickup_lat?: number | null
           driver_pickup_lng?: number | null
@@ -509,6 +515,7 @@ export type Database = {
           destination_area: string
           destination_lat: number
           destination_lng: number
+          dispatched_at: string | null
           driver_id: string | null
           driver_pickup_lat: number | null
           driver_pickup_lng: number | null
@@ -554,6 +561,7 @@ export type Database = {
           destination_area: string
           destination_lat: number
           destination_lng: number
+          dispatched_at: string | null
           driver_id: string | null
           driver_pickup_lat: number | null
           driver_pickup_lng: number | null
@@ -605,6 +613,7 @@ export type Database = {
           destination_area: string
           destination_lat: number
           destination_lng: number
+          dispatched_at: string | null
           driver_id: string | null
           driver_pickup_lat: number | null
           driver_pickup_lng: number | null

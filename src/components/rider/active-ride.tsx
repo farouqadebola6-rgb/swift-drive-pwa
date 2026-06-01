@@ -23,6 +23,7 @@ import {
   STATUS_TONE,
   type RideStatus,
 } from "@/lib/ride-flow";
+import { initRidePayment } from "@/lib/paystack.functions";
 
 type ActiveRide = {
   id: number;
@@ -195,6 +196,11 @@ export function RiderActiveRide({ ride }: Props) {
         </div>
       )}
 
+      {ride.payment_method === "online" &&
+        (ride.status === "started" || ride.status === "completed") && (
+          <PayOnlineButton rideId={ride.id} />
+        )}
+
       {isCompleted && !existingRating && (
         <div className="mt-5 border-t border-border pt-5">
           <p className="mb-2 text-sm font-medium">Rate your driver</p>
@@ -244,5 +250,25 @@ export function RiderActiveRide({ ride }: Props) {
         </p>
       )}
     </Card>
+  );
+}
+
+
+function PayOnlineButton({ rideId }: { rideId: number }) {
+  const pay = useMutation({
+    mutationFn: async () => {
+      const init = await initRidePayment({ data: { rideId } });
+      if (!init.authorization_url) throw new Error("Could not start payment");
+      window.location.href = init.authorization_url;
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <div className="mt-4">
+      <Button onClick={() => pay.mutate()} disabled={pay.isPending}>
+        {pay.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+        Pay online now
+      </Button>
+    </div>
   );
 }

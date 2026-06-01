@@ -560,14 +560,17 @@ function DriverManageDialog({
           <DriverDetailsBlock driver={driver} />
         </div>
 
-        <DialogFooter className="mt-2">
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={save} disabled={saving}>
-            {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Save changes
-          </Button>
+        <DialogFooter className="mt-2 flex-wrap gap-2 sm:justify-between">
+          <SubaccountButton driver={driver} />
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={save} disabled={saving}>
+              {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
+              Save changes
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -1032,3 +1035,33 @@ function PriceField({
   );
 }
 
+
+function SubaccountButton({ driver }: { driver: DriverRow & { user_id?: string } }) {
+  const [busy, setBusy] = useState(false);
+  const handle = async () => {
+    setBusy(true);
+    try {
+      const { createDriverSubaccount } = await import("@/lib/paystack.functions");
+      const res = await createDriverSubaccount({
+        data: { driverId: (driver as unknown as { user_id: string }).user_id },
+      });
+      toast.success(
+        res.already
+          ? `Subaccount already linked: ${res.code}`
+          : `Subaccount created: ${res.code}`,
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+  const hasCode = !!(driver as unknown as { paystack_subaccount_code?: string })
+    .paystack_subaccount_code;
+  return (
+    <Button variant="outline" size="sm" onClick={handle} disabled={busy}>
+      {busy && <Loader2 className="mr-2 size-4 animate-spin" />}
+      {hasCode ? "Refresh Paystack subaccount" : "Create Paystack subaccount"}
+    </Button>
+  );
+}

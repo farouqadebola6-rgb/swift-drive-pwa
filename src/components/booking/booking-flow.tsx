@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { LocationAutocomplete } from "./location-autocomplete";
 import { RouteMap } from "./route-map";
+import { dispatchRideToGroup } from "@/lib/whatsapp.functions";
 
 function formatNaira(n: number) {
   return new Intl.NumberFormat("en-NG", {
@@ -105,6 +106,12 @@ export function BookingFlow() {
         .select("id")
         .single();
       if (error) throw error;
+      // Fire-and-forget dispatch to driver WhatsApp group
+      if (data?.id) {
+        void dispatchRideToGroup({ data: { rideId: data.id } }).catch(() => {
+          /* dispatch failures are surfaced in admin > dispatch logs */
+        });
+      }
       return data;
     },
     onSuccess: () => {
