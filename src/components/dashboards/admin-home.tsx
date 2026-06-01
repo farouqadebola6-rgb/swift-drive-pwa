@@ -560,14 +560,17 @@ function DriverManageDialog({
           <DriverDetailsBlock driver={driver} />
         </div>
 
-        <DialogFooter className="mt-2">
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={save} disabled={saving}>
-            {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Save changes
-          </Button>
+        <DialogFooter className="mt-2 flex-wrap gap-2 sm:justify-between">
+          <SubaccountButton driver={driver} />
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={save} disabled={saving}>
+              {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
+              Save changes
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
