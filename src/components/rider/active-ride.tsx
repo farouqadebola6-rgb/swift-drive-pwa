@@ -252,3 +252,67 @@ export function RiderActiveRide({ ride }: Props) {
     </Card>
   );
 }
+
+type PaystackPop = {
+  newTransaction: (opts: {
+    key: string;
+    email: string;
+    amount: number;
+    ref: string;
+    onSuccess: () => void;
+    onCancel: () => void;
+  }) => void;
+};
+
+function loadPaystackScript(): Promise<PaystackPop> {
+  return new Promise((resolve, reject) => {
+    const w = window as unknown as { PaystackPop?: new () => PaystackPop };
+    if (w.PaystackPop) return resolve(new w.PaystackPop());
+    const s = document.createElement("script");
+    s.src = "https://js.paystack.co/v2/inline.js";
+    s.async = true;
+    s.onload = () => {
+      const ww = window as unknown as { PaystackPop?: new () => PaystackPop };
+      if (ww.PaystackPop) resolve(new ww.PaystackPop());
+      else reject(new Error("PaystackPop failed to load"));
+    };
+    s.onerror = () => reject(new Error("Failed to load Paystack script"));
+    document.body.appendChild(s);
+  });
+}
+
+function PayOnlineButton({ rideId }: { rideId: number }) {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const pay = useMutation({
+    mutationFn: async () => {
+      const init = await initRidePayment({ data: { rideId } });
+      const pop = await loadPaystackScript();
+      await new Promise<void>((resolve, reject) => {
+        pop.newTransaction({
+          key: init.public_key,
+          email: user?.email ?? "",
+          amount: Math.round(
+            Number(init.authorization_url ? 0 : 0) || 0,
+          ), // amount is server-set via reference; v2 inline accepts amount too
+          ref: init.reference,
+          onSuccess: () => resolve(),
+          onCancel: () => reject(new Error("Payment cancelled")),
+        });
+      });
+    },
+    onSuccess: () => {
+      toast.success("Payment received — thank you!");
+      void qc.invalidateQueries({ queryKey: ["activeRide"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <div className="mt-4">
+      <Button onClick={() => pay.mutate()} disabled={pay.isPending}>
+        {pay.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+        Pay online now
+      </Button>
+    </div>
+  );
+}
