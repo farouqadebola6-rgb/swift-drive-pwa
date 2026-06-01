@@ -500,7 +500,7 @@ function DriverManageDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{driver.profile?.full_name ?? "Driver"}</DialogTitle>
           <DialogDescription>
