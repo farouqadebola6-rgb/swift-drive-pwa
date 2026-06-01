@@ -106,6 +106,12 @@ export function BookingFlow() {
         .select("id")
         .single();
       if (error) throw error;
+      // Fire-and-forget dispatch to driver WhatsApp group
+      if (data?.id) {
+        void dispatchRideToGroup({ data: { rideId: data.id } }).catch(() => {
+          /* dispatch failures are surfaced in admin > dispatch logs */
+        });
+      }
       return data;
     },
     onSuccess: () => {
