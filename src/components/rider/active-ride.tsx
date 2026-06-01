@@ -253,33 +253,6 @@ export function RiderActiveRide({ ride }: Props) {
   );
 }
 
-type PaystackPop = {
-  newTransaction: (opts: {
-    key: string;
-    email: string;
-    amount: number;
-    ref: string;
-    onSuccess: () => void;
-    onCancel: () => void;
-  }) => void;
-};
-
-function loadPaystackScript(): Promise<PaystackPop> {
-  return new Promise((resolve, reject) => {
-    const w = window as unknown as { PaystackPop?: new () => PaystackPop };
-    if (w.PaystackPop) return resolve(new w.PaystackPop());
-    const s = document.createElement("script");
-    s.src = "https://js.paystack.co/v2/inline.js";
-    s.async = true;
-    s.onload = () => {
-      const ww = window as unknown as { PaystackPop?: new () => PaystackPop };
-      if (ww.PaystackPop) resolve(new ww.PaystackPop());
-      else reject(new Error("PaystackPop failed to load"));
-    };
-    s.onerror = () => reject(new Error("Failed to load Paystack script"));
-    document.body.appendChild(s);
-  });
-}
 
 function PayOnlineButton({ rideId }: { rideId: number }) {
   const pay = useMutation({
