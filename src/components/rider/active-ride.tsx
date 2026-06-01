@@ -23,6 +23,7 @@ import {
   STATUS_TONE,
   type RideStatus,
 } from "@/lib/ride-flow";
+import { initRidePayment } from "@/lib/paystack.functions";
 
 type ActiveRide = {
   id: number;
