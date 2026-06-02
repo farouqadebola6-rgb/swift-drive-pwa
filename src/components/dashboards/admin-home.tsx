@@ -85,6 +85,7 @@ type DriverRow = {
   insurance_doc_url: string | null;
   vehicle_registration_doc_url: string | null;
   onboarding_submitted_at: string | null;
+  paystack_subaccount_code: string | null;
   profile?: { full_name: string | null; phone: string | null } | null;
 };
 
