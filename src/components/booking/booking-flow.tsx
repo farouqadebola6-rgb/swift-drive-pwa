@@ -34,7 +34,7 @@ export function BookingFlow() {
   const [destination, setDestination] = useState<GeoPlace | null>(null);
   const [route, setRoute] = useState<RouteResult | null>(null);
   const [routing, setRouting] = useState(false);
-  const [method, setMethod] = useState<"online" | "cash">("cash");
+  const [method, setMethod] = useState<"online" | "cash">("online");
 
   const { data: pricing } = useQuery({
     queryKey: ["pricing_config"],
@@ -176,18 +176,6 @@ export function BookingFlow() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setMethod("cash")}
-                className={cn(
-                  "flex items-center justify-center gap-2 rounded-lg border p-3 text-sm transition",
-                  method === "cash"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border hover:bg-muted",
-                )}
-              >
-                <Banknote className="size-4" /> Cash
-              </button>
-              <button
-                type="button"
                 onClick={() => setMethod("online")}
                 className={cn(
                   "flex items-center justify-center gap-2 rounded-lg border p-3 text-sm transition",
@@ -198,18 +186,30 @@ export function BookingFlow() {
               >
                 <CreditCard className="size-4" /> Online (Paystack)
               </button>
+              <button
+                type="button"
+                onClick={() => setMethod("cash")}
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-lg border p-3 text-sm transition",
+                  method === "cash"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border hover:bg-muted",
+                )}
+              >
+                <Banknote className="size-4" /> Cash
+              </button>
             </div>
-            {method === "online" && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Online payment activates in Phase 4 (Paystack). Use Cash for now.
-              </p>
-            )}
+            <p className="mt-2 text-xs text-muted-foreground">
+              {method === "online"
+                ? "You'll pay securely via Paystack after a driver accepts."
+                : "Pay your driver directly in cash at the end of the trip."}
+            </p>
           </div>
 
           <Button
             className="w-full"
             size="lg"
-            disabled={!canBook || createRide.isPending || method === "online"}
+            disabled={!canBook || createRide.isPending}
             onClick={() => createRide.mutate()}
           >
             {createRide.isPending ? (
