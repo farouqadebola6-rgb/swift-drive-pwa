@@ -1,13 +1,26 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, useMemo, type FormEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Upload, FileCheck2 } from "lucide-react";
+import { Loader2, Upload, FileCheck2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  listPaystackBanks,
+  resolveBankAccount,
+  type PaystackBank,
+} from "@/lib/paystack-banks.functions";
 
 type FileField =
   | "profile_photo_url"
@@ -37,6 +50,9 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     return typeof v === "string" ? v : "";
   };
 
+  const fetchBanks = useServerFn(listPaystackBanks);
+  const resolveAcct = useServerFn(resolveBankAccount);
+
   const [submitting, setSubmitting] = useState(false);
   const [uploads, setUploads] = useState<Record<FileField, string>>({
     profile_photo_url: getStr("profile_photo_url"),
@@ -46,6 +62,51 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     vehicle_registration_doc_url: getStr("vehicle_registration_doc_url"),
   });
   const [uploading, setUploading] = useState<FileField | null>(null);
+
+  // Bank state
+  const [banks, setBanks] = useState<PaystackBank[]>([]);
+  const [banksLoading, setBanksLoading] = useState(true);
+  const [bankName, setBankName] = useState(getStr("bank_name"));
+  const [accountNumber, setAccountNumber] = useState(getStr("account_number"));
+  const [resolvedName, setResolvedName] = useState<string | null>(null);
+  const [resolving, setResolving] = useState(false);
+  const [resolveError, setResolveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchBanks({ data: undefined })
+      .then((b) => setBanks(b))
+      .catch(() => toast.error("Couldn't load bank list — refresh to retry"))
+      .finally(() => setBanksLoading(false));
+  }, [fetchBanks]);
+
+  const selectedBank = useMemo(
+    () => banks.find((b) => b.name === bankName),
+    [banks, bankName],
+  );
+
+  // Auto-resolve account name when bank + 10-digit account number are set
+  useEffect(() => {
+    setResolvedName(null);
+    setResolveError(null);
+    if (!selectedBank || !/^\d{10}$/.test(accountNumber)) return;
+    let cancelled = false;
+    setResolving(true);
+    resolveAcct({ data: { account_number: accountNumber, bank_code: selectedBank.code } })
+      .then((res) => {
+        if (cancelled) return;
+        setResolvedName(res.account_name);
+      })
+      .catch((e: unknown) => {
+        if (cancelled) return;
+        setResolveError(e instanceof Error ? e.message : "Could not verify account");
+      })
+      .finally(() => {
+        if (!cancelled) setResolving(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedBank, accountNumber, resolveAcct]);
 
   const handleUpload = async (field: FileField, file: File) => {
     if (!user) return;
@@ -90,10 +151,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     const vehicle_year = vehicle_year_raw ? Number(vehicle_year_raw) : null;
     const plate_number = get("plate_number");
     const vehicle_registration_number = get("vehicle_registration_number");
-    const bank_name = get("bank_name");
-    const account_number = get("account_number");
 
-    // Validation
     const required: [string, string][] = [
       [full_name, "Full name"],
       [phone, "Phone"],
@@ -108,8 +166,8 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       [vehicle_model, "Vehicle model"],
       [vehicle_colour, "Vehicle colour"],
       [plate_number, "Plate number"],
-      [bank_name, "Bank name"],
-      [account_number, "Account number"],
+      [bankName, "Bank"],
+      [accountNumber, "Account number"],
     ];
     for (const [v, label] of required) {
       if (!v) {
@@ -121,8 +179,12 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       toast.error("NIN must be 11 digits");
       return;
     }
-    if (!/^\d{10}$/.test(account_number)) {
+    if (!/^\d{10}$/.test(accountNumber)) {
       toast.error("Account number must be 10 digits");
+      return;
+    }
+    if (!resolvedName) {
+      toast.error("Please wait for account name verification, or fix the account details");
       return;
     }
     if (vehicle_year && (vehicle_year < 1990 || vehicle_year > new Date().getFullYear() + 1)) {
@@ -139,7 +201,6 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
 
     setSubmitting(true);
 
-    // Update profile (name/phone)
     const { error: profErr } = await supabase
       .from("profiles")
       .update({ full_name, phone })
@@ -150,7 +211,6 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       return;
     }
 
-    // Update driver record
     const driverPayload = {
       date_of_birth,
       home_address,
@@ -165,8 +225,8 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       vehicle_year,
       plate_number,
       vehicle_registration_number: vehicle_registration_number || null,
-      bank_name,
-      account_number,
+      bank_name: bankName,
+      account_number: accountNumber,
       profile_photo_url: uploads.profile_photo_url,
       vehicle_photo_url: uploads.vehicle_photo_url,
       licence_url: uploads.licence_url,
@@ -233,11 +293,51 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       </Card>
 
       <Card className="p-6">
-        <h3 className="mb-4 text-lg font-semibold">Payout account</h3>
-        <p className="mb-3 text-xs text-muted-foreground">Online ride payouts will be sent here.</p>
+        <h3 className="mb-1 text-lg font-semibold">Payout account</h3>
+        <p className="mb-4 text-xs text-muted-foreground">
+          We verify your bank details with Paystack so online ride payouts land in the right account.
+        </p>
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Bank name" name="bank_name" defaultValue={getStr("bank_name")} />
-          <Field label="Account number" name="account_number" inputMode="numeric" maxLength={10} defaultValue={getStr("account_number")} />
+          <div>
+            <Label>Bank</Label>
+            <Select value={bankName} onValueChange={setBankName} disabled={banksLoading}>
+              <SelectTrigger>
+                <SelectValue placeholder={banksLoading ? "Loading banks…" : "Select your bank"} />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {banks.map((b) => (
+                  <SelectItem key={b.code} value={b.name}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Account number</Label>
+            <Input
+              inputMode="numeric"
+              maxLength={10}
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+              placeholder="10-digit NUBAN"
+            />
+            <div className="mt-1.5 min-h-[1.25rem] text-xs">
+              {resolving && (
+                <span className="inline-flex items-center gap-1 text-muted-foreground">
+                  <Loader2 className="size-3 animate-spin" /> Verifying with bank…
+                </span>
+              )}
+              {!resolving && resolvedName && (
+                <span className="inline-flex items-center gap-1 font-medium text-success">
+                  <CheckCircle2 className="size-3" /> {resolvedName}
+                </span>
+              )}
+              {!resolving && resolveError && (
+                <span className="text-destructive">{resolveError}</span>
+              )}
+            </div>
+          </div>
         </div>
       </Card>
 
