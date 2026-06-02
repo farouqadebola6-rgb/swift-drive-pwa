@@ -489,12 +489,30 @@ function DriverManageDialog({
       .from("drivers")
       .update(patch)
       .eq("user_id", driver.user_id);
-    setSaving(false);
     if (error) {
+      setSaving(false);
       toast.error(error.message);
       return;
     }
-    toast.success("Driver updated.");
+
+    // Auto-create Paystack subaccount when transitioning to verified
+    const becameVerified =
+      driver.verification_status !== status &&
+      (status === "verified_digital" || status === "verified_physical");
+    if (becameVerified && !driver.paystack_subaccount_code && driver.bank_name && driver.account_number) {
+      try {
+        const { createDriverSubaccount } = await import("@/lib/paystack.functions");
+        const res = await createDriverSubaccount({ data: { driverId: driver.user_id } });
+        toast.success(`Driver verified. Paystack subaccount ${res.already ? "linked" : "created"}: ${res.code}`);
+      } catch (e) {
+        toast.warning(
+          `Driver verified, but Paystack subaccount failed: ${e instanceof Error ? e.message : "unknown"}. Use the button below to retry.`,
+        );
+      }
+    } else {
+      toast.success("Driver updated.");
+    }
+    setSaving(false);
     onSaved();
   };
 
