@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/use-auth";
+import { InstallPwaBanner } from "@/components/install-pwa-banner";
 
 function NotFoundComponent() {
   return (
@@ -95,13 +96,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Hamduk Drive — Cheaper rides in Lagos" },
-      { name: "description", content: "Lagos Wheels is a PWA ride-hailing app connecting riders and drivers via WhatsApp." },
-      { property: "og:description", content: "Lagos Wheels is a PWA ride-hailing app connecting riders and drivers via WhatsApp." },
-      { name: "twitter:description", content: "Lagos Wheels is a PWA ride-hailing app connecting riders and drivers via WhatsApp." },
+      { name: "twitter:description", content: "Driver-first ride-hailing for Lagos. WhatsApp-native dispatch. Lower fees." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7d7d825d-9efa-4e0f-a3e0-3af5856d9fdf/id-preview-9ddba3f6--48a43c73-1534-464f-8d2e-0d8ee8c2648c.lovable.app-1780128740868.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7d7d825d-9efa-4e0f-a3e0-3af5856d9fdf/id-preview-9ddba3f6--48a43c73-1534-464f-8d2e-0d8ee8c2648c.lovable.app-1780128740868.png" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "apple-touch-icon", href: "/icon-512.png" },
+      { rel: "icon", type: "image/png", href: "/icon-512.png" },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -130,6 +134,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
+        <InstallPwaBanner />
         <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>

@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -10,12 +10,20 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   const { loading, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!user) {
       navigate({ to: "/auth", search: { mode: "signin", role: "rider" } });
+      return;
     }
-  }, [loading, user, navigate]);
+    // Email verification gate (Play Store / App Store requirement).
+    // Skip the gate on the verify-email screen itself.
+    if (!user.email_confirmed_at && location.pathname !== "/verify-email") {
+      navigate({ to: "/verify-email" });
+    }
+  }, [loading, user, navigate, location.pathname]);
 
   if (loading || !user) {
     return (
