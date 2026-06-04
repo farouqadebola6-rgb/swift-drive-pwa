@@ -2,11 +2,11 @@
   "name": "Hamduk Drive",
   "short_name": "Hamduk",
   "description": "Cheaper rides for Lagos. Driver-first ride hailing.",
-  "start_url": "/app",
+  "start_url": "/welcome",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
+  "background_color": "#0b3d2e",
   "theme_color": "#0b3d2e",
   "icons": [
     {
