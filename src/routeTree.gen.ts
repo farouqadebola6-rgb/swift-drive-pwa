@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PayCallbackRouteImport } from './routes/pay.callback'
 import { Route as AuthenticatedVerifyEmailRouteImport } from './routes/_authenticated/verify-email'
+import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -80,6 +81,11 @@ const AuthenticatedVerifyEmailRoute =
     path: '/verify-email',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSafetyRoute = AuthenticatedSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/safety': typeof AuthenticatedSafetyRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/safety': typeof AuthenticatedSafetyRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/app'
     | '/profile'
+    | '/safety'
     | '/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/app'
     | '/profile'
+    | '/safety'
     | '/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/app'
     | '/_authenticated/profile'
+    | '/_authenticated/safety'
     | '/_authenticated/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -297,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerifyEmailRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/safety': {
+      id: '/_authenticated/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof AuthenticatedSafetyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -332,6 +351,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedVerifyEmailRoute: typeof AuthenticatedVerifyEmailRoute
 }
 
@@ -339,6 +359,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedVerifyEmailRoute: AuthenticatedVerifyEmailRoute,
 }
 
