@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -23,6 +24,11 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack/webhook'
 
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/welcome': typeof WelcomeRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/verify-email': typeof AuthenticatedVerifyEmailRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/support'
     | '/terms'
+    | '/welcome'
     | '/account'
     | '/app'
     | '/verify-email'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/support'
     | '/terms'
+    | '/welcome'
     | '/account'
     | '/app'
     | '/verify-email'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/support'
     | '/terms'
+    | '/welcome'
     | '/_authenticated/account'
     | '/_authenticated/app'
     | '/_authenticated/verify-email'
@@ -189,12 +201,20 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
+  WelcomeRoute: typeof WelcomeRoute
   PayCallbackRoute: typeof PayCallbackRoute
   ApiPublicPaystackWebhookRoute: typeof ApiPublicPaystackWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -314,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
+  WelcomeRoute: WelcomeRoute,
   PayCallbackRoute: PayCallbackRoute,
   ApiPublicPaystackWebhookRoute: ApiPublicPaystackWebhookRoute,
 }
