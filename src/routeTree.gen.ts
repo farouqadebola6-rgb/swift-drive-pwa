@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PayCallbackRouteImport } from './routes/pay.callback'
 import { Route as AuthenticatedVerifyEmailRouteImport } from './routes/_authenticated/verify-email'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack/webhook'
@@ -79,6 +80,11 @@ const AuthenticatedVerifyEmailRoute =
     path: '/verify-email',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/welcome': typeof WelcomeRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/account'
     | '/app'
+    | '/profile'
     | '/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/account'
     | '/app'
+    | '/profile'
     | '/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/_authenticated/account'
     | '/_authenticated/app'
+    | '/_authenticated/profile'
     | '/_authenticated/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerifyEmailRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
@@ -312,12 +331,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedVerifyEmailRoute: typeof AuthenticatedVerifyEmailRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedVerifyEmailRoute: AuthenticatedVerifyEmailRoute,
 }
 
@@ -341,3 +362,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
