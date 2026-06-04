@@ -25,6 +25,7 @@ import { Route as AuthenticatedSavedPlacesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
 import { Route as AuthenticatedRidesRouteImport } from './routes/_authenticated/rides'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack/webhook'
@@ -110,6 +111,12 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/rides': typeof AuthenticatedRidesRoute
   '/safety': typeof AuthenticatedSafetyRoute
@@ -158,6 +166,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/rides': typeof AuthenticatedRidesRoute
   '/safety': typeof AuthenticatedSafetyRoute
@@ -180,6 +189,7 @@ export interface FileRoutesById {
   '/welcome': typeof WelcomeRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/rides': typeof AuthenticatedRidesRoute
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/account'
     | '/app'
+    | '/notifications'
     | '/profile'
     | '/rides'
     | '/safety'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/account'
     | '/app'
+    | '/notifications'
     | '/profile'
     | '/rides'
     | '/safety'
@@ -243,6 +255,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/_authenticated/account'
     | '/_authenticated/app'
+    | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/rides'
     | '/_authenticated/safety'
@@ -381,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
@@ -408,6 +428,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRidesRoute: typeof AuthenticatedRidesRoute
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
@@ -419,6 +440,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRidesRoute: AuthenticatedRidesRoute,
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
