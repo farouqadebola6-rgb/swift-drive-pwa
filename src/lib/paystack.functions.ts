@@ -85,12 +85,27 @@ export const initRidePayment = createServerFn({ method: "POST" })
 
     const reference = `ride_${ride.id}_${Date.now()}`;
 
+    // Build absolute callback URL so Paystack can redirect the rider back
+    // into the app after payment.
+    let origin = "";
+    try {
+      const { getRequestHeader, getRequestHost } = await import(
+        "@tanstack/react-start/server"
+      );
+      const proto = getRequestHeader("x-forwarded-proto") ?? "https";
+      const host = getRequestHost();
+      if (host) origin = `${proto}://${host}`;
+    } catch {
+      // origin stays empty — Paystack falls back to dashboard callback
+    }
+
     const initBody: Record<string, unknown> = {
       email,
       amount: amountKobo,
       reference,
       metadata: { ride_id: ride.id, rider_id: userId },
     };
+    if (origin) initBody.callback_url = `${origin}/pay/callback`;
     if (subaccount) {
       initBody.subaccount = subaccount;
       initBody.bearer = "account"; // platform bears Paystack fees
