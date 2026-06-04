@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PayCallbackRouteImport } from './routes/pay.callback'
 import { Route as AuthenticatedVerifyEmailRouteImport } from './routes/_authenticated/verify-email'
+import { Route as AuthenticatedSavedPlacesRouteImport } from './routes/_authenticated/saved-places'
 import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
@@ -81,6 +82,12 @@ const AuthenticatedVerifyEmailRoute =
     path: '/verify-email',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSavedPlacesRoute =
+  AuthenticatedSavedPlacesRouteImport.update({
+    id: '/saved-places',
+    path: '/saved-places',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSafetyRoute = AuthenticatedSafetyRouteImport.update({
   id: '/safety',
   path: '/safety',
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/safety': typeof AuthenticatedSafetyRoute
+  '/saved-places': typeof AuthenticatedSavedPlacesRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -138,6 +146,7 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/safety': typeof AuthenticatedSafetyRoute
+  '/saved-places': typeof AuthenticatedSavedPlacesRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -157,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
+  '/_authenticated/saved-places': typeof AuthenticatedSavedPlacesRoute
   '/_authenticated/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/profile'
     | '/safety'
+    | '/saved-places'
     | '/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/profile'
     | '/safety'
+    | '/saved-places'
     | '/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -211,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/profile'
     | '/_authenticated/safety'
+    | '/_authenticated/saved-places'
     | '/_authenticated/verify-email'
     | '/pay/callback'
     | '/api/public/paystack/webhook'
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerifyEmailRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/saved-places': {
+      id: '/_authenticated/saved-places'
+      path: '/saved-places'
+      fullPath: '/saved-places'
+      preLoaderRoute: typeof AuthenticatedSavedPlacesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/safety': {
       id: '/_authenticated/safety'
       path: '/safety'
@@ -352,6 +372,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
+  AuthenticatedSavedPlacesRoute: typeof AuthenticatedSavedPlacesRoute
   AuthenticatedVerifyEmailRoute: typeof AuthenticatedVerifyEmailRoute
 }
 
@@ -360,6 +381,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
+  AuthenticatedSavedPlacesRoute: AuthenticatedSavedPlacesRoute,
   AuthenticatedVerifyEmailRoute: AuthenticatedVerifyEmailRoute,
 }
 
