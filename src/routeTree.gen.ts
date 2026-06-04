@@ -23,6 +23,7 @@ import { Route as AuthenticatedVerifyEmailRouteImport } from './routes/_authenti
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSavedPlacesRouteImport } from './routes/_authenticated/saved-places'
 import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
+import { Route as AuthenticatedRidesRouteImport } from './routes/_authenticated/rides'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -99,6 +100,11 @@ const AuthenticatedSafetyRoute = AuthenticatedSafetyRouteImport.update({
   path: '/safety',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedRidesRoute = AuthenticatedRidesRouteImport.update({
+  id: '/rides',
+  path: '/rides',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/rides': typeof AuthenticatedRidesRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/saved-places': typeof AuthenticatedSavedPlacesRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/rides': typeof AuthenticatedRidesRoute
   '/safety': typeof AuthenticatedSafetyRoute
   '/saved-places': typeof AuthenticatedSavedPlacesRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/rides': typeof AuthenticatedRidesRoute
   '/_authenticated/safety': typeof AuthenticatedSafetyRoute
   '/_authenticated/saved-places': typeof AuthenticatedSavedPlacesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/app'
     | '/profile'
+    | '/rides'
     | '/safety'
     | '/saved-places'
     | '/settings'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/app'
     | '/profile'
+    | '/rides'
     | '/safety'
     | '/saved-places'
     | '/settings'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/app'
     | '/_authenticated/profile'
+    | '/_authenticated/rides'
     | '/_authenticated/safety'
     | '/_authenticated/saved-places'
     | '/_authenticated/settings'
@@ -355,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSafetyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/rides': {
+      id: '/_authenticated/rides'
+      path: '/rides'
+      fullPath: '/rides'
+      preLoaderRoute: typeof AuthenticatedRidesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -390,6 +409,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRidesRoute: typeof AuthenticatedRidesRoute
   AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
   AuthenticatedSavedPlacesRoute: typeof AuthenticatedSavedPlacesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -400,6 +420,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRidesRoute: AuthenticatedRidesRoute,
   AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
   AuthenticatedSavedPlacesRoute: AuthenticatedSavedPlacesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
