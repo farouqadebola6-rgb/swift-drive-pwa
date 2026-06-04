@@ -236,3 +236,53 @@ export const createDriverSubaccount = createServerFn({ method: "POST" })
 
     return { code, already: false };
   });
+
+/**
+ * Verify a Paystack transaction by reference and reconcile the payment row.
+ * Called from the rider's browser when Paystack redirects them back to
+ * /pay/callback?reference=... (the webhook also updates the row, but the
+ * callback can run before/after the webhook so we run both paths).
+ */
+export const verifyRidePayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ reference: z.string().min(1).max(120) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const resp = await fetch(
+      `${PAYSTACK_BASE}/transaction/verify/${encodeURIComponent(data.reference)}`,
+      { headers: authHeaders() },
+    );
+    const json = (await resp.json()) as {
+      status: boolean;
+      data?: {
+        status: string;
+        amount: number;
+        authorization?: { authorization_code?: string };
+        metadata?: { ride_id?: number };
+      };
+    };
+    if (!resp.ok || !json.status || !json.data) {
+      return { status: "failed" as const, rideId: null as number | null };
+    }
+    const paystackStatus = json.data.status;
+    const newStatus =
+      paystackStatus === "success"
+        ? "captured"
+        : paystackStatus === "failed"
+          ? "failed"
+          : "pending";
+
+    await supabaseAdmin
+      .from("payments")
+      .update({
+        status: newStatus,
+        paystack_authorization_code:
+          json.data.authorization?.authorization_code ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("paystack_reference", data.reference);
+
+    const rideId = json.data.metadata?.ride_id ?? null;
+    return { status: newStatus, rideId };
+  });
