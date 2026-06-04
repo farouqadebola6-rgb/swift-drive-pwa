@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/use-auth";
 import { InstallPwaBanner } from "@/components/install-pwa-banner";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 
 function NotFoundComponent() {
   return (
