@@ -9,17 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PayCallbackRouteImport } from './routes/pay.callback'
 import { Route as AuthenticatedVerifyEmailRouteImport } from './routes/_authenticated/verify-email'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSavedPlacesRouteImport } from './routes/_authenticated/saved-places'
+import { Route as AuthenticatedSafetyRouteImport } from './routes/_authenticated/safety'
+import { Route as AuthenticatedRidesRouteImport } from './routes/_authenticated/rides'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack/webhook'
 
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -30,9 +45,19 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -49,10 +74,47 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayCallbackRoute = PayCallbackRouteImport.update({
+  id: '/pay/callback',
+  path: '/pay/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedVerifyEmailRoute =
   AuthenticatedVerifyEmailRouteImport.update({
     id: '/verify-email',
     path: '/verify-email',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSavedPlacesRoute =
+  AuthenticatedSavedPlacesRouteImport.update({
+    id: '/saved-places',
+    path: '/saved-places',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSafetyRoute = AuthenticatedSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRidesRoute = AuthenticatedRidesRouteImport.update({
+  id: '/rides',
+  path: '/rides',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
@@ -75,23 +137,43 @@ const ApiPublicPaystackWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/rides': typeof AuthenticatedRidesRoute
+  '/safety': typeof AuthenticatedSafetyRoute
+  '/saved-places': typeof AuthenticatedSavedPlacesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
+  '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/welcome': typeof WelcomeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/app': typeof AuthenticatedAppRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/rides': typeof AuthenticatedRidesRoute
+  '/safety': typeof AuthenticatedSafetyRoute
+  '/saved-places': typeof AuthenticatedSavedPlacesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
+  '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
 }
 export interface FileRoutesById {
@@ -99,12 +181,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/welcome': typeof WelcomeRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/rides': typeof AuthenticatedRidesRoute
+  '/_authenticated/safety': typeof AuthenticatedSafetyRoute
+  '/_authenticated/saved-places': typeof AuthenticatedSavedPlacesRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/verify-email': typeof AuthenticatedVerifyEmailRoute
+  '/pay/callback': typeof PayCallbackRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
 }
 export interface FileRouteTypes {
@@ -112,35 +204,65 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/forgot-password'
     | '/privacy'
+    | '/reset-password'
     | '/support'
     | '/terms'
+    | '/welcome'
     | '/account'
     | '/app'
+    | '/notifications'
+    | '/profile'
+    | '/rides'
+    | '/safety'
+    | '/saved-places'
+    | '/settings'
     | '/verify-email'
+    | '/pay/callback'
     | '/api/public/paystack/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/forgot-password'
     | '/privacy'
+    | '/reset-password'
     | '/support'
     | '/terms'
+    | '/welcome'
     | '/account'
     | '/app'
+    | '/notifications'
+    | '/profile'
+    | '/rides'
+    | '/safety'
+    | '/saved-places'
+    | '/settings'
     | '/verify-email'
+    | '/pay/callback'
     | '/api/public/paystack/webhook'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/forgot-password'
     | '/privacy'
+    | '/reset-password'
     | '/support'
     | '/terms'
+    | '/welcome'
     | '/_authenticated/account'
     | '/_authenticated/app'
+    | '/_authenticated/notifications'
+    | '/_authenticated/profile'
+    | '/_authenticated/rides'
+    | '/_authenticated/safety'
+    | '/_authenticated/saved-places'
+    | '/_authenticated/settings'
     | '/_authenticated/verify-email'
+    | '/pay/callback'
     | '/api/public/paystack/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -148,14 +270,25 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   PrivacyRoute: typeof PrivacyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
+  WelcomeRoute: typeof WelcomeRoute
+  PayCallbackRoute: typeof PayCallbackRoute
   ApiPublicPaystackWebhookRoute: typeof ApiPublicPaystackWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -170,11 +303,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -198,11 +345,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pay/callback': {
+      id: '/pay/callback'
+      path: '/pay/callback'
+      fullPath: '/pay/callback'
+      preLoaderRoute: typeof PayCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/verify-email': {
       id: '/_authenticated/verify-email'
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof AuthenticatedVerifyEmailRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/saved-places': {
+      id: '/_authenticated/saved-places'
+      path: '/saved-places'
+      fullPath: '/saved-places'
+      preLoaderRoute: typeof AuthenticatedSavedPlacesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/safety': {
+      id: '/_authenticated/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof AuthenticatedSafetyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/rides': {
+      id: '/_authenticated/rides'
+      path: '/rides'
+      fullPath: '/rides'
+      preLoaderRoute: typeof AuthenticatedRidesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/app': {
@@ -232,12 +428,24 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRidesRoute: typeof AuthenticatedRidesRoute
+  AuthenticatedSafetyRoute: typeof AuthenticatedSafetyRoute
+  AuthenticatedSavedPlacesRoute: typeof AuthenticatedSavedPlacesRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedVerifyEmailRoute: typeof AuthenticatedVerifyEmailRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRidesRoute: AuthenticatedRidesRoute,
+  AuthenticatedSafetyRoute: AuthenticatedSafetyRoute,
+  AuthenticatedSavedPlacesRoute: AuthenticatedSavedPlacesRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedVerifyEmailRoute: AuthenticatedVerifyEmailRoute,
 }
 
@@ -249,9 +457,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   PrivacyRoute: PrivacyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
+  WelcomeRoute: WelcomeRoute,
+  PayCallbackRoute: PayCallbackRoute,
   ApiPublicPaystackWebhookRoute: ApiPublicPaystackWebhookRoute,
 }
 export const routeTree = rootRouteImport

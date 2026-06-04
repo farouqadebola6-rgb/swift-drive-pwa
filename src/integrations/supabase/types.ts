@@ -189,6 +189,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: number
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: number
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: number
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -433,6 +463,36 @@ export type Database = {
           trip_end_time?: string | null
           trip_start_time?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_places: {
+        Row: {
+          address: string
+          created_at: string
+          id: number
+          label: string
+          lat: number | null
+          lng: number | null
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: number
+          label: string
+          lat?: number | null
+          lng?: number | null
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: number
+          label?: string
+          lat?: number | null
+          lng?: number | null
+          user_id?: string
         }
         Relationships: []
       }

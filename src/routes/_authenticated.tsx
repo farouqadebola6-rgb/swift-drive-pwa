@@ -18,8 +18,6 @@ function AuthenticatedLayout() {
       navigate({ to: "/auth", search: { mode: "signin", role: "rider" } });
       return;
     }
-    // Email verification gate (Play Store / App Store requirement).
-    // Skip the gate on the verify-email screen itself.
     if (!user.email_confirmed_at && location.pathname !== "/verify-email") {
       navigate({ to: "/verify-email" });
     }
@@ -33,5 +31,9 @@ function AuthenticatedLayout() {
     );
   }
 
-  return <Outlet />;
+  return (
+    <div className="pb-20">
+      <Outlet />
+    </div>
+  );
 }
