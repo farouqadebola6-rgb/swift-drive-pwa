@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { RiderHome } from "@/components/dashboards/rider-home";
 import { DriverHome } from "@/components/dashboards/driver-home";
 import { AdminHome } from "@/components/dashboards/admin-home";
 import { NoRole } from "@/components/dashboards/no-role";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "Dashboard — Hamduk Drive" }] }),
@@ -12,8 +14,14 @@ export const Route = createFileRoute("/_authenticated/app")({
 
 function AppDispatcher() {
   const { role } = useAuth();
-  if (role === "admin") return <AdminHome />;
-  if (role === "driver") return <DriverHome />;
-  if (role === "rider") return <RiderHome />;
-  return <NoRole />;
+  const qc = useQueryClient();
+  const onRefresh = () => qc.invalidateQueries();
+
+  let inner: React.ReactNode;
+  if (role === "admin") inner = <AdminHome />;
+  else if (role === "driver") inner = <DriverHome />;
+  else if (role === "rider") inner = <RiderHome />;
+  else inner = <NoRole />;
+
+  return <PullToRefresh onRefresh={onRefresh}>{inner}</PullToRefresh>;
 }
