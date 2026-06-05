@@ -18,7 +18,7 @@ function RidesPage() {
   const { user, role } = useAuth();
   const isDriver = role === "driver";
 
-  const { data: rides = [], isLoading } = useQuery({
+  const { data: rides = [], isLoading, refetch } = useQuery({
     queryKey: ["rides-history", user?.id, role],
     enabled: !!user,
     queryFn: async () => {
@@ -38,6 +38,7 @@ function RidesPage() {
 
   return (
     <DashboardShell title="Rides" subtitle={isDriver ? "Trips you've driven." : "Your ride history."}>
+      <PullToRefresh onRefresh={() => refetch()}>
       {isLoading ? (
         <div className="grid place-items-center py-12">
           <Loader2 className="size-5 animate-spin text-primary" />
@@ -82,6 +83,7 @@ function RidesPage() {
           ))}
         </div>
       )}
+      </PullToRefresh>
     </DashboardShell>
   );
 }
