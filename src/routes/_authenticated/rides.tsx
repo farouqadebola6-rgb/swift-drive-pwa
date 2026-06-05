@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, MapPin } from "lucide-react";
 import { naira, STATUS_LABEL, STATUS_TONE, type RideStatus } from "@/lib/ride-flow";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 export const Route = createFileRoute("/_authenticated/rides")({
   head: () => ({ meta: [{ title: "Your rides — Hamduk Drive" }] }),
