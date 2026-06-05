@@ -144,5 +144,16 @@
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
       "Helvetica Neue", Arial, sans-serif;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  [role="button"],
+  nav a,
+  nav button {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 }

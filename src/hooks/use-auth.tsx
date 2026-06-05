@@ -66,6 +66,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Sync dark mode with the OS-level prefers-color-scheme setting.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = (dark: boolean) => {
+      document.documentElement.classList.toggle("dark", dark);
+    };
+    apply(mql.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setSession(null);

@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/hooks/use-auth";
 import { InstallPwaBanner } from "@/components/install-pwa-banner";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
+import { PageTransition } from "@/components/page-transition";
 
 function NotFoundComponent() {
   return (
@@ -134,7 +135,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
         <BottomTabBar />
         <InstallPwaBanner />
         <Toaster position="top-center" richColors />

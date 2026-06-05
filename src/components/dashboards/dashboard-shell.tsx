@@ -1,9 +1,11 @@
 import { type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { Bell } from "lucide-react";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
+import { Bell, ChevronLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+
+const ROOT_ROUTES = new Set(["/app", "/rides", "/account"]);
 
 export function DashboardShell({
   title,
@@ -17,6 +19,9 @@ export function DashboardShell({
   badge?: ReactNode;
 }) {
   const { user } = useAuth();
+  const { pathname } = useLocation();
+  const router = useRouter();
+  const isRoot = ROOT_ROUTES.has(pathname);
 
   const { data: unread = 0 } = useQuery({
     queryKey: ["notifications", "unread", user?.id],
@@ -39,13 +44,23 @@ export function DashboardShell({
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link to="/app" className="flex items-center gap-2">
-            <div
-              className="size-7 rounded-lg shadow-sm"
-              style={{ background: "var(--gradient-primary)" }}
-            />
-            <span className="font-semibold tracking-tight">Hamduk Drive</span>
-          </Link>
+          {isRoot ? (
+            <Link to="/app" className="flex items-center gap-2">
+              <div
+                className="size-7 rounded-lg shadow-sm"
+                style={{ background: "var(--gradient-primary)" }}
+              />
+              <span className="font-semibold tracking-tight">Hamduk Drive</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.history.back()}
+              className="-ml-2 flex items-center gap-1 rounded-full px-2 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
+              aria-label="Back"
+            >
+              <ChevronLeft className="size-5" /> Back
+            </button>
+          )}
           <Link
             to="/notifications"
             className="relative grid size-10 place-items-center rounded-full bg-muted/60 text-foreground hover:bg-muted"
@@ -61,7 +76,7 @@ export function DashboardShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-5 md:py-8">
+      <main className="mx-auto max-w-5xl px-4 py-5 pb-24 md:py-8">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{title}</h1>
