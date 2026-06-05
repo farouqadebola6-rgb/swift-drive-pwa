@@ -23,10 +23,27 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const deleteFn = useServerFn(deleteMyAccount);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await deleteFn({ data: undefined });
+      await supabase.auth.signOut();
+      toast.success("Your account has been deleted.");
+      navigate({ to: "/" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not delete account");
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -82,6 +99,43 @@ function ProfilePage() {
           </div>
         )}
       </Card>
+
+      <Card className="mt-5 rounded-2xl border-destructive/30 p-5">
+        <h3 className="text-sm font-semibold text-destructive">Delete account</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          This cancels active rides and permanently removes your profile.
+        </p>
+        <Button
+          variant="destructive"
+          className="mt-3 h-11 w-full rounded-full"
+          onClick={() => setConfirmOpen(true)}
+          disabled={deleting}
+        >
+          <Trash2 className="mr-2 size-4" /> Delete my account
+        </Button>
+      </Card>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your Hamduk Drive account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will cancel active rides, remove your profile, and sign you out. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); void handleDelete(); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleting}
+            >
+              {deleting && <Loader2 className="mr-2 size-4 animate-spin" />}
+              Yes, delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardShell>
   );
 }
