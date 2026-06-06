@@ -157,7 +157,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
 
     const required: [string, string][] = [
       [full_name, "Full name"],
-      [phone, "Phone"],
+      [phoneVal, "Phone"],
       [date_of_birth, "Date of birth"],
       [home_address, "Home address"],
       [nin, "NIN"],
