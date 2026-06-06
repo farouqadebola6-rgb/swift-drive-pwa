@@ -62,6 +62,9 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     vehicle_registration_doc_url: getStr("vehicle_registration_doc_url"),
   });
   const [uploading, setUploading] = useState<FileField | null>(null);
+  const [phone, setPhone] = useState(getStr("__phone"));
+  const [phoneVerified, setPhoneVerified] = useState(false);
+
 
   // Bank state
   const [banks, setBanks] = useState<PaystackBank[]>([]);
