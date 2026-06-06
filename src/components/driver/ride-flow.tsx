@@ -1,31 +1,32 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Loader2,
-  MapPin,
-  Banknote,
-  CreditCard,
-  Navigation,
-  CheckCircle2,
-  Play,
-  XCircle,
+  Loader2, MapPin, Banknote, CreditCard, Navigation, CheckCircle2, Play,
+  XCircle, Siren, Share2,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  acceptRide,
-  cancelRide,
-  completeRide,
-  markRideStatus,
-  naira,
-  STATUS_LABEL,
-  STATUS_TONE,
-  type RideStatus,
+  acceptRide, cancelRide, completeRide, markRideStatus, naira,
+  STATUS_LABEL, STATUS_TONE, type RideStatus,
 } from "@/lib/ride-flow";
+import { triggerSos, shareTrip } from "@/lib/safety.functions";
+
+function getPos(): Promise<{ lat: number; lng: number } | null> {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => resolve(null),
+      { timeout: 5000 },
+    );
+  });
+}
 
 type PoolRide = {
   id: number;
