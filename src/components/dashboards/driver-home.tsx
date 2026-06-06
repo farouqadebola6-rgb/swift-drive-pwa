@@ -8,6 +8,8 @@ import { ShieldCheck, ShieldAlert, Wallet, Car, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { DriverRideFlow } from "@/components/driver/ride-flow";
 import { DriverOnboardingForm } from "@/components/driver/onboarding-form";
+import { PullToRefresh } from "@/components/pull-to-refresh";
+import { useQueryClient } from "@tanstack/react-query";
 
 type DriverRow = {
   verification_status: "pending" | "verified_digital" | "verified_physical" | "suspended";
@@ -26,9 +28,14 @@ type DriverRow = {
 
 export function DriverHome() {
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [driver, setDriver] = useState<DriverRow | null>(null);
   const [profile, setProfile] = useState<{ full_name: string | null; phone: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    await qc.invalidateQueries({ queryKey: ["driver"] });
+  }, [qc]);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -154,6 +161,7 @@ export function DriverHome() {
         </Badge>
       }
     >
+      <PullToRefresh onRefresh={refresh}>
       {debtLocked && (
         <Card className="mb-5 border-warning/40 bg-warning/5 p-5">
           <div className="flex items-start gap-3">
@@ -209,6 +217,7 @@ export function DriverHome() {
           </div>
         </div>
       </Card>
+      </PullToRefresh>
     </DashboardShell>
   );
 }

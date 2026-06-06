@@ -99,6 +99,8 @@ export function DriverRideFlow() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const activeKey = ["driver", "activeRide", user?.id] as const;
+
   const advance = useMutation({
     mutationFn: ({
       id,
@@ -107,8 +109,17 @@ export function DriverRideFlow() {
       id: number;
       status: "driver_arrived" | "started";
     }) => markRideStatus(id, status),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["driver"] }),
-    onError: (e: Error) => toast.error(e.message),
+    onMutate: async ({ status }) => {
+      await qc.cancelQueries({ queryKey: activeKey });
+      const prev = qc.getQueryData<ActiveRide | null>(activeKey);
+      if (prev) qc.setQueryData<ActiveRide | null>(activeKey, { ...prev, status });
+      return { prev };
+    },
+    onError: (e: Error, _v, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(activeKey, ctx.prev);
+      toast.error(e.message);
+    },
+    onSettled: () => void qc.invalidateQueries({ queryKey: ["driver"] }),
   });
 
   const finish = useMutation({
@@ -121,20 +132,34 @@ export function DriverRideFlow() {
       distance: number;
       duration: number;
     }) => completeRide(id, distance, duration),
-    onSuccess: () => {
-      toast.success("Trip completed.");
-      void qc.invalidateQueries({ queryKey: ["driver"] });
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: activeKey });
+      const prev = qc.getQueryData<ActiveRide | null>(activeKey);
+      qc.setQueryData<ActiveRide | null>(activeKey, null);
+      return { prev };
     },
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: () => toast.success("Trip completed."),
+    onError: (e: Error, _v, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(activeKey, ctx.prev);
+      toast.error(e.message);
+    },
+    onSettled: () => void qc.invalidateQueries({ queryKey: ["driver"] }),
   });
 
   const cancel = useMutation({
     mutationFn: (id: number) => cancelRide(id, "Cancelled by driver"),
-    onSuccess: () => {
-      toast.message("Ride cancelled.");
-      void qc.invalidateQueries({ queryKey: ["driver"] });
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: activeKey });
+      const prev = qc.getQueryData<ActiveRide | null>(activeKey);
+      qc.setQueryData<ActiveRide | null>(activeKey, null);
+      return { prev };
     },
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: () => toast.message("Ride cancelled."),
+    onError: (e: Error, _v, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(activeKey, ctx.prev);
+      toast.error(e.message);
+    },
+    onSettled: () => void qc.invalidateQueries({ queryKey: ["driver"] }),
   });
 
   if (active.isLoading) {
