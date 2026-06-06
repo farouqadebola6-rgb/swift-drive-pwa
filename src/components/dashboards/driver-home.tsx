@@ -28,9 +28,18 @@ type DriverRow = {
 
 export function DriverHome() {
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [driver, setDriver] = useState<DriverRow | null>(null);
   const [profile, setProfile] = useState<{ full_name: string | null; phone: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["driver"] }),
+      load(),
+    ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qc]);
 
   const load = useCallback(async () => {
     if (!user) return;
