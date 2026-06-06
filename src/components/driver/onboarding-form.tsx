@@ -254,7 +254,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
         <h3 className="mb-4 text-lg font-semibold">Personal details</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Full legal name" name="full_name" defaultValue={getStr("__full_name")} />
-          <Field label="Phone number" name="phone" type="tel" defaultValue={getStr("__phone")} />
+          <PhoneVerifyField defaultValue={getStr("__phone")} value={phone} onChange={setPhone} verified={phoneVerified} onVerified={() => setPhoneVerified(true)} />
           <Field label="Date of birth" name="date_of_birth" type="date" defaultValue={getStr("date_of_birth")} />
           <Field label="National Identification Number (NIN)" name="nin" inputMode="numeric" maxLength={11} defaultValue={getStr("nin")} />
           <div className="md:col-span-2">
