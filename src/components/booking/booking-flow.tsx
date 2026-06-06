@@ -15,7 +15,7 @@ import {
   type RouteResult,
 } from "@/lib/geo";
 import { cn } from "@/lib/utils";
-import { LocationAutocomplete } from "./location-autocomplete";
+import { LocationAutocomplete, type SavedPlaceLite } from "./location-autocomplete";
 import { RouteMap } from "./route-map";
 import { dispatchRideToGroup } from "@/lib/whatsapp.functions";
 
