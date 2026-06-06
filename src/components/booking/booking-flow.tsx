@@ -156,6 +156,8 @@ export function BookingFlow() {
             value={pickup}
             onChange={setPickup}
             iconClassName="text-primary"
+            showLocateButton
+            savedPlaces={savedPlaces}
           />
           <LocationAutocomplete
             label="Destination"
@@ -163,6 +165,7 @@ export function BookingFlow() {
             value={destination}
             onChange={setDestination}
             iconClassName="text-accent"
+            savedPlaces={savedPlaces}
           />
 
           {route && pricing && (
