@@ -8,6 +8,8 @@ import { ShieldCheck, ShieldAlert, Wallet, Car, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { DriverRideFlow } from "@/components/driver/ride-flow";
 import { DriverOnboardingForm } from "@/components/driver/onboarding-form";
+import { PullToRefresh } from "@/components/pull-to-refresh";
+import { useQueryClient } from "@tanstack/react-query";
 
 type DriverRow = {
   verification_status: "pending" | "verified_digital" | "verified_physical" | "suspended";
