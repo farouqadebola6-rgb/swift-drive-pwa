@@ -161,6 +161,7 @@ export function DriverHome() {
         </Badge>
       }
     >
+      <PullToRefresh onRefresh={refresh}>
       {debtLocked && (
         <Card className="mb-5 border-warning/40 bg-warning/5 p-5">
           <div className="flex items-start gap-3">
