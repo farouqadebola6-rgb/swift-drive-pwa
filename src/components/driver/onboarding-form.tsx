@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Upload, FileCheck2, CheckCircle2 } from "lucide-react";
+import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-verify.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
