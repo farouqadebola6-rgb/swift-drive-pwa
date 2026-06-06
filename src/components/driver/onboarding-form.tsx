@@ -412,3 +412,91 @@ function Field({
     </div>
   );
 }
+
+function PhoneVerifyField({
+  defaultValue,
+  value,
+  onChange,
+  verified,
+  onVerified,
+}: {
+  defaultValue: string;
+  value: string;
+  onChange: (v: string) => void;
+  verified: boolean;
+  onVerified: () => void;
+}) {
+  const sendOtp = useServerFn(requestPhoneOtp);
+  const verifyOtp = useServerFn(verifyPhoneOtp);
+  const [sent, setSent] = useState(false);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (defaultValue && !value) onChange(defaultValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <Label>Phone number (WhatsApp)</Label>
+      <div className="flex gap-2">
+        <Input
+          type="tel"
+          value={value}
+          onChange={(e) => { onChange(e.target.value); setSent(false); }}
+          placeholder="+234..."
+        />
+        {verified ? (
+          <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-3 text-xs font-medium text-success">
+            <CheckCircle2 className="size-3.5" /> Verified
+          </span>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy || value.trim().length < 7}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                const r = await sendOtp({ data: { phone: value } });
+                if (r.ok) { setSent(true); toast.success("Code sent via WhatsApp."); }
+                else toast.error("Could not send code.");
+              } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+              finally { setBusy(false); }
+            }}
+          >
+            {busy && <Loader2 className="mr-2 size-3 animate-spin" />}
+            Send code
+          </Button>
+        )}
+      </div>
+      {sent && !verified && (
+        <div className="mt-2 flex gap-2">
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            placeholder="6-digit code"
+          />
+          <Button
+            type="button"
+            disabled={busy || code.length !== 6}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await verifyOtp({ data: { phone: value, code } });
+                onVerified();
+                toast.success("Phone verified.");
+              } catch (e) { toast.error(e instanceof Error ? e.message : "Wrong code"); }
+              finally { setBusy(false); }
+            }}
+          >
+            Verify
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
