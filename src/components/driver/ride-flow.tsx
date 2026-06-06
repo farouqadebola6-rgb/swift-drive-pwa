@@ -252,9 +252,46 @@ export function DriverRideFlow() {
             <XCircle className="mr-2 size-4" /> Cancel
           </Button>
         </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            className="h-11"
+            onClick={async () => {
+              try {
+                const res = await shareFn({ data: { rideId: r.id } });
+                toast.success("Trip shared via WhatsApp.");
+                if (res.link && navigator.clipboard) void navigator.clipboard.writeText(res.link);
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : "Could not share");
+              }
+            }}
+          >
+            <Share2 className="mr-2 size-4" /> Share trip
+          </Button>
+          <Button
+            variant="destructive"
+            className="h-11"
+            onClick={async () => {
+              if (!confirm("Trigger SOS? This will dial 112 and alert your emergency contact.")) return;
+              const pos = await getPos();
+              window.location.href = "tel:112";
+              try {
+                const res = await sosFn({ data: { rideId: r.id, lat: pos?.lat, lng: pos?.lng } });
+                if (!res.hasContact) toast.warning("Add an emergency contact in Safety.");
+                else toast.success(res.delivered ? "Emergency contact notified." : "Could not reach emergency contact.");
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : "SOS failed");
+              }
+            }}
+          >
+            <Siren className="mr-2 size-4" /> SOS — 112
+          </Button>
+        </div>
       </Card>
     );
   }
+
 
   return (
     <Card className="p-6">
