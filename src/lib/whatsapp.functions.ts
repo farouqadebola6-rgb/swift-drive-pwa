@@ -66,7 +66,7 @@ export const dispatchRideToGroup = createServerFn({ method: "POST" })
     ].join("\n");
 
     try {
-      const resp = await fetch(url, {
+      const resp = await fetch(`${url.replace(/\/$/, "")}/message/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
