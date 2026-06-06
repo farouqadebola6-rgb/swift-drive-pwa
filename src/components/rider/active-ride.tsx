@@ -138,7 +138,8 @@ export function RiderActiveRide({ ride }: Props) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const isPaid = !!paymentRow && (paymentRow.status === "captured" || paymentRow.status === "success");
+  const payStatus = paymentRow?.status as string | undefined;
+  const isPaid = payStatus === "captured" || payStatus === "authorized" || payStatus === "success";
   const canCancel = ride.status === "pending" || ride.status === "in_progress";
   const isCompleted = ride.status === "completed";
   const isActive = ride.status === "in_progress" || ride.status === "driver_arrived" || ride.status === "started";
