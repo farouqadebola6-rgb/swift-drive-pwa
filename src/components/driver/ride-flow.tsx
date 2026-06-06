@@ -51,6 +51,9 @@ type ActiveRide = PoolRide & {
 export function DriverRideFlow() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const sosFn = useServerFn(triggerSos);
+  const shareFn = useServerFn(shareTrip);
+
 
   const active = useQuery({
     queryKey: ["driver", "activeRide", user?.id],
