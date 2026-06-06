@@ -189,6 +189,50 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_reports: {
+        Row: {
+          category: string
+          contact_phone: string | null
+          created_at: string
+          description: string
+          id: string
+          ride_id: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          contact_phone?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          ride_id?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          ride_id?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_reports_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
@@ -269,6 +313,39 @@ export type Database = {
           },
         ]
       }
+      phone_verifications: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       pricing_config: {
         Row: {
           base_fare: number
@@ -303,25 +380,34 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           full_name: string | null
           id: string
           phone: string | null
+          phone_verified_at: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           full_name?: string | null
           id: string
           phone?: string | null
+          phone_verified_at?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           full_name?: string | null
           id?: string
           phone?: string | null
+          phone_verified_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -393,6 +479,7 @@ export type Database = {
           pickup_lat: number
           pickup_lng: number
           rider_id: string
+          share_token: string | null
           status: Database["public"]["Enums"]["ride_status"]
           trip_end_time: string | null
           trip_start_time: string | null
@@ -426,6 +513,7 @@ export type Database = {
           pickup_lat: number
           pickup_lng: number
           rider_id: string
+          share_token?: string | null
           status?: Database["public"]["Enums"]["ride_status"]
           trip_end_time?: string | null
           trip_start_time?: string | null
@@ -459,6 +547,7 @@ export type Database = {
           pickup_lat?: number
           pickup_lng?: number
           rider_id?: string
+          share_token?: string | null
           status?: Database["public"]["Enums"]["ride_status"]
           trip_end_time?: string | null
           trip_start_time?: string | null
@@ -474,6 +563,7 @@ export type Database = {
           label: string
           lat: number | null
           lng: number | null
+          slot: string | null
           user_id: string
         }
         Insert: {
@@ -483,6 +573,7 @@ export type Database = {
           label: string
           lat?: number | null
           lng?: number | null
+          slot?: string | null
           user_id: string
         }
         Update: {
@@ -492,6 +583,7 @@ export type Database = {
           label?: string
           lat?: number | null
           lng?: number | null
+          slot?: string | null
           user_id?: string
         }
         Relationships: []
@@ -590,6 +682,7 @@ export type Database = {
           pickup_lat: number
           pickup_lng: number
           rider_id: string
+          share_token: string | null
           status: Database["public"]["Enums"]["ride_status"]
           trip_end_time: string | null
           trip_start_time: string | null
@@ -636,6 +729,7 @@ export type Database = {
           pickup_lat: number
           pickup_lng: number
           rider_id: string
+          share_token: string | null
           status: Database["public"]["Enums"]["ride_status"]
           trip_end_time: string | null
           trip_start_time: string | null
@@ -688,6 +782,7 @@ export type Database = {
           pickup_lat: number
           pickup_lng: number
           rider_id: string
+          share_token: string | null
           status: Database["public"]["Enums"]["ride_status"]
           trip_end_time: string | null
           trip_start_time: string | null
