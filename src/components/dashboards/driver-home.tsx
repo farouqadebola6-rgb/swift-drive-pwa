@@ -34,11 +34,7 @@ export function DriverHome() {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    await Promise.all([
-      qc.invalidateQueries({ queryKey: ["driver"] }),
-      load(),
-    ]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    await qc.invalidateQueries({ queryKey: ["driver"] });
   }, [qc]);
 
   const load = useCallback(async () => {
