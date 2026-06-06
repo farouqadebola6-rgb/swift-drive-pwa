@@ -217,6 +217,7 @@ export function DriverHome() {
           </div>
         </div>
       </Card>
+      </PullToRefresh>
     </DashboardShell>
   );
 }
