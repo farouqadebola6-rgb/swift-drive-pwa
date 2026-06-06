@@ -286,3 +286,22 @@ export const verifyRidePayment = createServerFn({ method: "POST" })
     const rideId = json.data.metadata?.ride_id ?? null;
     return { status: newStatus, rideId };
   });
+
+/**
+ * Returns the latest payments row for a ride, scoped to the rider or driver
+ * by RLS. Used by the UI to show a "Paid" pill instead of "Pay now".
+ */
+export const getRidePaymentStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ rideId: z.number().int().positive() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: row } = await supabase
+      .from("payments")
+      .select("status, amount, paystack_reference, created_at")
+      .eq("ride_id", data.rideId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return row ?? null;
+  });
