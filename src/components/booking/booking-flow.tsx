@@ -35,6 +35,26 @@ export function BookingFlow() {
   const [route, setRoute] = useState<RouteResult | null>(null);
   const [routing, setRouting] = useState(false);
   const [method, setMethod] = useState<"online" | "cash">("online");
+  const { data: savedPlaces = [] } = useQuery({
+    queryKey: ["saved-places", user?.id],
+    enabled: !!user,
+    queryFn: async (): Promise<SavedPlaceLite[]> => {
+      const { data } = await supabase
+        .from("saved_places")
+        .select("slot, label, address, lat, lng")
+        .not("slot", "is", null);
+      return ((data ?? []) as Array<{
+        slot: "home" | "work" | "favorite" | null;
+        label: string;
+        address: string;
+        lat: number | null;
+        lng: number | null;
+      }>)
+        .filter((p): p is SavedPlaceLite => p.slot !== null && p.lat != null && p.lng != null)
+        .map((p) => ({ slot: p.slot, label: p.label, address: p.address, lat: p.lat, lng: p.lng }));
+    },
+  });
+
 
   const { data: pricing } = useQuery({
     queryKey: ["pricing_config"],
