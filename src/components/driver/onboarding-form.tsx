@@ -139,7 +139,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     const get = (k: string) => String(fd.get(k) ?? "").trim();
 
     const full_name = get("full_name");
-    const phone = get("phone");
+    const phoneVal = phone.trim();
     const date_of_birth = get("date_of_birth");
     const home_address = get("home_address");
     const nin = get("nin");
