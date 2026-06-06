@@ -201,12 +201,16 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       toast.error(`Please upload: ${missingFiles.map((f) => f.label).join(", ")}`);
       return;
     }
+    if (!phoneVerified) {
+      toast.error("Verify your phone via WhatsApp before submitting.");
+      return;
+    }
 
     setSubmitting(true);
 
     const { error: profErr } = await supabase
       .from("profiles")
-      .update({ full_name, phone })
+      .update({ full_name, phone: phoneVal })
       .eq("id", user.id);
     if (profErr) {
       setSubmitting(false);
