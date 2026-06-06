@@ -1,28 +1,44 @@
 // Geo helpers — Nominatim (geocoding) + OSRM (routing). Public endpoints.
-// Lagos viewbox biases search to greater Lagos.
+// Search is unrestricted — users can find any place worldwide. A light
+// "Lagos, Nigeria" suffix is appended only when the query has no commas
+// (i.e. looks like a short local query) so common Lagos searches still rank
+// well without blocking far-away queries.
 
 export interface GeoPlace {
   display_name: string;
   lat: number;
   lng: number;
-  area: string; // short locality (LGA / suburb)
+  area: string;
 }
 
-const LAGOS_VIEWBOX = "2.7,6.8,4.4,6.3"; // lon_min,lat_max,lon_max,lat_min
 const NOMINATIM = "https://nominatim.openstreetmap.org";
 const OSRM = "https://router.project-osrm.org";
+
+function deriveArea(addr?: Record<string, string>): string {
+  if (!addr) return "";
+  return (
+    addr.suburb ||
+    addr.neighbourhood ||
+    addr.city_district ||
+    addr.town ||
+    addr.city ||
+    addr.village ||
+    addr.county ||
+    addr.state ||
+    addr.country ||
+    ""
+  );
+}
 
 export async function searchPlaces(query: string, signal?: AbortSignal): Promise<GeoPlace[]> {
   const q = query.trim();
   if (q.length < 3) return [];
+  const biased = q.includes(",") ? q : `${q}, Lagos, Nigeria`;
   const url = new URL(`${NOMINATIM}/search`);
-  url.searchParams.set("q", `${q}, Lagos, Nigeria`);
+  url.searchParams.set("q", biased);
   url.searchParams.set("format", "json");
-  url.searchParams.set("limit", "6");
+  url.searchParams.set("limit", "8");
   url.searchParams.set("addressdetails", "1");
-  url.searchParams.set("countrycodes", "ng");
-  url.searchParams.set("viewbox", LAGOS_VIEWBOX);
-  url.searchParams.set("bounded", "1");
 
   const res = await fetch(url.toString(), {
     signal,
@@ -39,21 +55,42 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
     display_name: d.display_name,
     lat: parseFloat(d.lat),
     lng: parseFloat(d.lon),
-    area:
-      d.address?.suburb ||
-      d.address?.neighbourhood ||
-      d.address?.city_district ||
-      d.address?.town ||
-      d.address?.city ||
-      d.address?.county ||
-      "Lagos",
+    area: deriveArea(d.address) || "Unknown",
   }));
+}
+
+export async function reverseGeocode(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<GeoPlace | null> {
+  const url = new URL(`${NOMINATIM}/reverse`);
+  url.searchParams.set("lat", String(lat));
+  url.searchParams.set("lon", String(lng));
+  url.searchParams.set("format", "json");
+  url.searchParams.set("addressdetails", "1");
+  const res = await fetch(url.toString(), {
+    signal,
+    headers: { "Accept-Language": "en" },
+  });
+  if (!res.ok) return null;
+  const d = (await res.json()) as {
+    display_name?: string;
+    address?: Record<string, string>;
+  };
+  if (!d?.display_name) return null;
+  return {
+    display_name: d.display_name,
+    lat,
+    lng,
+    area: deriveArea(d.address) || "Current location",
+  };
 }
 
 export interface RouteResult {
   distance_km: number;
   duration_min: number;
-  geometry: Array<[number, number]>; // [lat, lng]
+  geometry: Array<[number, number]>;
 }
 
 export async function getRoute(
@@ -90,6 +127,5 @@ export function estimateFare(
   cfg: PricingConfig,
 ): number {
   const raw = cfg.base_fare + distance_km * cfg.per_km_rate + duration_min * cfg.per_minute_rate;
-  // Round up to nearest 50 NGN
   return Math.ceil(raw / 50) * 50;
 }

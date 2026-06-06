@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Upload, FileCheck2, CheckCircle2 } from "lucide-react";
+import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-verify.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -62,6 +63,9 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     vehicle_registration_doc_url: getStr("vehicle_registration_doc_url"),
   });
   const [uploading, setUploading] = useState<FileField | null>(null);
+  const [phone, setPhone] = useState(getStr("__phone"));
+  const [phoneVerified, setPhoneVerified] = useState(false);
+
 
   // Bank state
   const [banks, setBanks] = useState<PaystackBank[]>([]);
@@ -136,7 +140,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
     const get = (k: string) => String(fd.get(k) ?? "").trim();
 
     const full_name = get("full_name");
-    const phone = get("phone");
+    const phoneVal = phone.trim();
     const date_of_birth = get("date_of_birth");
     const home_address = get("home_address");
     const nin = get("nin");
@@ -154,7 +158,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
 
     const required: [string, string][] = [
       [full_name, "Full name"],
-      [phone, "Phone"],
+      [phoneVal, "Phone"],
       [date_of_birth, "Date of birth"],
       [home_address, "Home address"],
       [nin, "NIN"],
@@ -198,12 +202,16 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
       toast.error(`Please upload: ${missingFiles.map((f) => f.label).join(", ")}`);
       return;
     }
+    if (!phoneVerified) {
+      toast.error("Verify your phone via WhatsApp before submitting.");
+      return;
+    }
 
     setSubmitting(true);
 
     const { error: profErr } = await supabase
       .from("profiles")
-      .update({ full_name, phone })
+      .update({ full_name, phone: phoneVal })
       .eq("id", user.id);
     if (profErr) {
       setSubmitting(false);
@@ -254,7 +262,7 @@ export function DriverOnboardingForm({ initial, onSubmitted }: Props) {
         <h3 className="mb-4 text-lg font-semibold">Personal details</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Full legal name" name="full_name" defaultValue={getStr("__full_name")} />
-          <Field label="Phone number" name="phone" type="tel" defaultValue={getStr("__phone")} />
+          <PhoneVerifyField defaultValue={getStr("__phone")} value={phone} onChange={setPhone} verified={phoneVerified} onVerified={() => setPhoneVerified(true)} />
           <Field label="Date of birth" name="date_of_birth" type="date" defaultValue={getStr("date_of_birth")} />
           <Field label="National Identification Number (NIN)" name="nin" inputMode="numeric" maxLength={11} defaultValue={getStr("nin")} />
           <div className="md:col-span-2">
@@ -405,3 +413,91 @@ function Field({
     </div>
   );
 }
+
+function PhoneVerifyField({
+  defaultValue,
+  value,
+  onChange,
+  verified,
+  onVerified,
+}: {
+  defaultValue: string;
+  value: string;
+  onChange: (v: string) => void;
+  verified: boolean;
+  onVerified: () => void;
+}) {
+  const sendOtp = useServerFn(requestPhoneOtp);
+  const verifyOtp = useServerFn(verifyPhoneOtp);
+  const [sent, setSent] = useState(false);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (defaultValue && !value) onChange(defaultValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <Label>Phone number (WhatsApp)</Label>
+      <div className="flex gap-2">
+        <Input
+          type="tel"
+          value={value}
+          onChange={(e) => { onChange(e.target.value); setSent(false); }}
+          placeholder="+234..."
+        />
+        {verified ? (
+          <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-3 text-xs font-medium text-success">
+            <CheckCircle2 className="size-3.5" /> Verified
+          </span>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy || value.trim().length < 7}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                const r = await sendOtp({ data: { phone: value } });
+                if (r.ok) { setSent(true); toast.success("Code sent via WhatsApp."); }
+                else toast.error("Could not send code.");
+              } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+              finally { setBusy(false); }
+            }}
+          >
+            {busy && <Loader2 className="mr-2 size-3 animate-spin" />}
+            Send code
+          </Button>
+        )}
+      </div>
+      {sent && !verified && (
+        <div className="mt-2 flex gap-2">
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            placeholder="6-digit code"
+          />
+          <Button
+            type="button"
+            disabled={busy || code.length !== 6}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await verifyOtp({ data: { phone: value, code } });
+                onVerified();
+                toast.success("Phone verified.");
+              } catch (e) { toast.error(e instanceof Error ? e.message : "Wrong code"); }
+              finally { setBusy(false); }
+            }}
+          >
+            Verify
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+

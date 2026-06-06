@@ -15,7 +15,7 @@ import {
   type RouteResult,
 } from "@/lib/geo";
 import { cn } from "@/lib/utils";
-import { LocationAutocomplete } from "./location-autocomplete";
+import { LocationAutocomplete, type SavedPlaceLite } from "./location-autocomplete";
 import { RouteMap } from "./route-map";
 import { dispatchRideToGroup } from "@/lib/whatsapp.functions";
 
@@ -35,6 +35,26 @@ export function BookingFlow() {
   const [route, setRoute] = useState<RouteResult | null>(null);
   const [routing, setRouting] = useState(false);
   const [method, setMethod] = useState<"online" | "cash">("online");
+  const { data: savedPlaces = [] } = useQuery({
+    queryKey: ["saved-places", user?.id],
+    enabled: !!user,
+    queryFn: async (): Promise<SavedPlaceLite[]> => {
+      const { data } = await supabase
+        .from("saved_places")
+        .select("slot, label, address, lat, lng")
+        .not("slot", "is", null);
+      return ((data ?? []) as Array<{
+        slot: "home" | "work" | "favorite" | null;
+        label: string;
+        address: string;
+        lat: number | null;
+        lng: number | null;
+      }>)
+        .filter((p): p is SavedPlaceLite => p.slot !== null && p.lat != null && p.lng != null)
+        .map((p) => ({ slot: p.slot, label: p.label, address: p.address, lat: p.lat, lng: p.lng }));
+    },
+  });
+
 
   const { data: pricing } = useQuery({
     queryKey: ["pricing_config"],
@@ -136,6 +156,8 @@ export function BookingFlow() {
             value={pickup}
             onChange={setPickup}
             iconClassName="text-primary"
+            showLocateButton
+            savedPlaces={savedPlaces}
           />
           <LocationAutocomplete
             label="Destination"
@@ -143,6 +165,7 @@ export function BookingFlow() {
             value={destination}
             onChange={setDestination}
             iconClassName="text-accent"
+            savedPlaces={savedPlaces}
           />
 
           {route && pricing && (
