@@ -178,6 +178,9 @@ function ProfilePage() {
                   </span>
                 )}
               </div>
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                We normalize to start with 234 so WhatsApp can reach you. No two accounts may share the same number.
+              </p>
               {phoneNeedsVerify && !otpSent && (
                 <Button onClick={handleSendOtp} disabled={sending} variant="outline" className="mt-3 h-11 w-full rounded-full">
                   {sending && <Loader2 className="mr-2 size-4 animate-spin" />}
@@ -199,6 +202,27 @@ function ProfilePage() {
                     Verify
                   </Button>
                 </div>
+              )}
+              {savedPhone && !phoneChanged && (
+                <Button
+                  variant="ghost"
+                  className="mt-2 h-10 w-full rounded-full text-xs text-destructive hover:bg-destructive/10"
+                  disabled={saving}
+                  onClick={async () => {
+                    if (!user) return;
+                    if (!confirm("Remove your phone number? You won't get WhatsApp ride updates until you add one again.")) return;
+                    setSaving(true);
+                    const { error } = await supabase.from("profiles").update({ phone: null, phone_verified_at: null }).eq("id", user.id);
+                    setSaving(false);
+                    if (error) toast.error(error.message);
+                    else {
+                      setPhone(""); setSavedPhone(""); setPhoneVerifiedAt(null);
+                      toast.success("Phone number removed.");
+                    }
+                  }}
+                >
+                  Remove phone number
+                </Button>
               )}
             </div>
           </div>
