@@ -16,6 +16,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { InstallPwaBanner } from "@/components/install-pwa-banner";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { PageTransition } from "@/components/page-transition";
+import { SosWatcher } from "@/components/sos-watcher";
 
 function NotFoundComponent() {
   return (
@@ -138,6 +139,7 @@ function RootComponent() {
         <PageTransition>
           <Outlet />
         </PageTransition>
+        <SosWatcher />
         <BottomTabBar />
         <InstallPwaBanner />
         <Toaster position="top-center" richColors />
