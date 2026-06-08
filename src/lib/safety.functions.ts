@@ -250,22 +250,10 @@ export const getSharedSos = createServerFn({ method: "POST" })
    Share trip — includes current coords
    ============================================================ */
 
-export const triggerSos = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((i) =>
-    z
-      .object({
-        rideId: z.number().int().positive().optional(),
-        lat: z.number().optional(),
-        lng: z.number().optional(),
-      })
-      .parse(i),
-  )
-  .handler(async ({ data, context }) => {
-    // Wrapper for backward compatibility: starts a session and returns the
-    // shape callers expect.
-    return startSosSession({ data, context } as never);
-  });
+// Backward-compat alias — callers may still import `triggerSos`. Behaves
+// identically to startSosSession.
+export const triggerSos = startSosSession;
+
 
 export const shareTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
