@@ -15,7 +15,8 @@ import {
   acceptRide, cancelRide, completeRide, markRideStatus, naira,
   STATUS_LABEL, STATUS_TONE, type RideStatus,
 } from "@/lib/ride-flow";
-import { triggerSos, shareTrip } from "@/lib/safety.functions";
+import { startSosSession, shareTrip } from "@/lib/safety.functions";
+import { useSosPinger } from "@/hooks/use-sos-pinger";
 
 function getPos(): Promise<{ lat: number; lng: number } | null> {
   return new Promise((resolve) => {
@@ -51,8 +52,9 @@ type ActiveRide = PoolRide & {
 export function DriverRideFlow() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const sosFn = useServerFn(triggerSos);
+  const sosFn = useServerFn(startSosSession);
   const shareFn = useServerFn(shareTrip);
+  const { setActive: setActiveSos } = useSosPinger();
 
 
   const active = useQuery({
@@ -259,7 +261,8 @@ export function DriverRideFlow() {
             className="h-11"
             onClick={async () => {
               try {
-                const res = await shareFn({ data: { rideId: r.id } });
+                const pos = await getPos();
+                const res = await shareFn({ data: { rideId: r.id, lat: pos?.lat, lng: pos?.lng } });
                 toast.success("Trip shared via WhatsApp.");
                 if (res.link && navigator.clipboard) void navigator.clipboard.writeText(res.link);
               } catch (e) {
@@ -278,8 +281,9 @@ export function DriverRideFlow() {
               window.location.href = "tel:112";
               try {
                 const res = await sosFn({ data: { rideId: r.id, lat: pos?.lat, lng: pos?.lng } });
+                setActiveSos({ sessionId: res.sessionId, shareToken: res.shareToken, link: res.link });
                 if (!res.hasContact) toast.warning("Add an emergency contact in Safety.");
-                else toast.success(res.delivered ? "Emergency contact notified." : "Could not reach emergency contact.");
+                else toast.success(res.delivered ? "Emergency contact notified — live tracking on." : "Live tracking on. (Couldn't reach emergency contact.)");
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "SOS failed");
               }

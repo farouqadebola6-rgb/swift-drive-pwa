@@ -17,7 +17,8 @@ import {
 } from "@/lib/ride-flow";
 import { initRidePayment, getRidePaymentStatus } from "@/lib/paystack.functions";
 import { getUserRatingSummary } from "@/lib/ratings.functions";
-import { triggerSos, shareTrip } from "@/lib/safety.functions";
+import { startSosSession, shareTrip } from "@/lib/safety.functions";
+import { useSosPinger } from "@/hooks/use-sos-pinger";
 
 type ActiveRide = {
   id: number;
@@ -51,8 +52,9 @@ export function RiderActiveRide({ ride }: Props) {
   const [comment, setComment] = useState("");
   const payStatusFn = useServerFn(getRidePaymentStatus);
   const ratingFn = useServerFn(getUserRatingSummary);
-  const sosFn = useServerFn(triggerSos);
+  const sosFn = useServerFn(startSosSession);
   const shareFn = useServerFn(shareTrip);
+  const { setActive: setActiveSos } = useSosPinger();
 
   const { data: driverInfo } = useQuery({
     queryKey: ["ride", ride.id, "driver", ride.driver_id],
@@ -123,14 +125,18 @@ export function RiderActiveRide({ ride }: Props) {
       return sosFn({ data: { rideId: ride.id, lat: pos?.lat, lng: pos?.lng } });
     },
     onSuccess: (r) => {
+      setActiveSos({ sessionId: r.sessionId, shareToken: r.shareToken, link: r.link });
       if (!r.hasContact) toast.warning("Add an emergency contact in Safety to alert someone next time.");
-      else toast.success(r.delivered ? "Emergency contact notified." : "Could not reach emergency contact.");
+      else toast.success(r.delivered ? "Emergency contact notified — live tracking is on." : "Live tracking on. (Couldn't reach emergency contact.)");
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const share = useMutation({
-    mutationFn: () => shareFn({ data: { rideId: ride.id } }),
+    mutationFn: async () => {
+      const pos = await getPosition();
+      return shareFn({ data: { rideId: ride.id, lat: pos?.lat, lng: pos?.lng } });
+    },
     onSuccess: (r) => {
       toast.success("Trip shared via WhatsApp.");
       if (r.link && navigator.clipboard) void navigator.clipboard.writeText(r.link);

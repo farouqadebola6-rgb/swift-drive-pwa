@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TripTokenRouteImport } from './routes/trip.$token'
+import { Route as SosTokenRouteImport } from './routes/sos.$token'
 import { Route as PayCallbackRouteImport } from './routes/pay.callback'
 import { Route as AuthenticatedVerifyEmailRouteImport } from './routes/_authenticated/verify-email'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -78,6 +79,11 @@ const IndexRoute = IndexRouteImport.update({
 const TripTokenRoute = TripTokenRouteImport.update({
   id: '/trip/$token',
   path: '/trip/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SosTokenRoute = SosTokenRouteImport.update({
+  id: '/sos/$token',
+  path: '/sos/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayCallbackRoute = PayCallbackRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
+  '/sos/$token': typeof SosTokenRoute
   '/trip/$token': typeof TripTokenRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
 }
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
+  '/sos/$token': typeof SosTokenRoute
   '/trip/$token': typeof TripTokenRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
 }
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/verify-email': typeof AuthenticatedVerifyEmailRoute
   '/pay/callback': typeof PayCallbackRoute
+  '/sos/$token': typeof SosTokenRoute
   '/trip/$token': typeof TripTokenRoute
   '/api/public/paystack/webhook': typeof ApiPublicPaystackWebhookRoute
 }
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/verify-email'
     | '/pay/callback'
+    | '/sos/$token'
     | '/trip/$token'
     | '/api/public/paystack/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/verify-email'
     | '/pay/callback'
+    | '/sos/$token'
     | '/trip/$token'
     | '/api/public/paystack/webhook'
   id:
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/verify-email'
     | '/pay/callback'
+    | '/sos/$token'
     | '/trip/$token'
     | '/api/public/paystack/webhook'
   fileRoutesById: FileRoutesById
@@ -289,6 +301,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   WelcomeRoute: typeof WelcomeRoute
   PayCallbackRoute: typeof PayCallbackRoute
+  SosTokenRoute: typeof SosTokenRoute
   TripTokenRoute: typeof TripTokenRoute
   ApiPublicPaystackWebhookRoute: typeof ApiPublicPaystackWebhookRoute
 }
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       path: '/trip/$token'
       fullPath: '/trip/$token'
       preLoaderRoute: typeof TripTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sos/$token': {
+      id: '/sos/$token'
+      path: '/sos/$token'
+      fullPath: '/sos/$token'
+      preLoaderRoute: typeof SosTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay/callback': {
@@ -484,19 +504,10 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   WelcomeRoute: WelcomeRoute,
   PayCallbackRoute: PayCallbackRoute,
+  SosTokenRoute: SosTokenRoute,
   TripTokenRoute: TripTokenRoute,
   ApiPublicPaystackWebhookRoute: ApiPublicPaystackWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

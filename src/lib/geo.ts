@@ -33,12 +33,12 @@ function deriveArea(addr?: Record<string, string>): string {
 export async function searchPlaces(query: string, signal?: AbortSignal): Promise<GeoPlace[]> {
   const q = query.trim();
   if (q.length < 3) return [];
-  const biased = q.includes(",") ? q : `${q}, Lagos, Nigeria`;
   const url = new URL(`${NOMINATIM}/search`);
-  url.searchParams.set("q", biased);
+  url.searchParams.set("q", q);
   url.searchParams.set("format", "json");
-  url.searchParams.set("limit", "8");
+  url.searchParams.set("limit", "10");
   url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("dedupe", "1");
 
   const res = await fetch(url.toString(), {
     signal,
