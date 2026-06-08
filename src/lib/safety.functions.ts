@@ -250,9 +250,6 @@ export const getSharedSos = createServerFn({ method: "POST" })
    Share trip — includes current coords
    ============================================================ */
 
-// Backward-compat alias — callers may still import `triggerSos`. Behaves
-// identically to startSosSession.
-export const triggerSos = startSosSession;
 
 
 export const shareTrip = createServerFn({ method: "POST" })
