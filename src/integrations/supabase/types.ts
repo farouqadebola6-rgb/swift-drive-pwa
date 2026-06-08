@@ -588,6 +588,71 @@ export type Database = {
         }
         Relationships: []
       }
+      sos_sessions: {
+        Row: {
+          created_at: string
+          emergency_contact_phone: string | null
+          id: number
+          initial_lat: number | null
+          initial_lng: number | null
+          last_lat: number | null
+          last_lng: number | null
+          last_ping_at: string | null
+          ride_id: number | null
+          share_token: string
+          started_at: string
+          status: string
+          stopped_at: string | null
+          stopped_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emergency_contact_phone?: string | null
+          id?: number
+          initial_lat?: number | null
+          initial_lng?: number | null
+          last_lat?: number | null
+          last_lng?: number | null
+          last_ping_at?: string | null
+          ride_id?: number | null
+          share_token?: string
+          started_at?: string
+          status?: string
+          stopped_at?: string | null
+          stopped_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emergency_contact_phone?: string | null
+          id?: number
+          initial_lat?: number | null
+          initial_lng?: number | null
+          last_lat?: number | null
+          last_lng?: number | null
+          last_ping_at?: string | null
+          ride_id?: number | null
+          share_token?: string
+          started_at?: string
+          status?: string
+          stopped_at?: string | null
+          stopped_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_sessions_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -795,6 +860,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      normalize_phone: { Args: { _phone: string }; Returns: string }
     }
     Enums: {
       app_role: "rider" | "driver" | "admin"
